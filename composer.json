@@ -1,0 +1,17 @@
+{
+	"name": "neushimmer/wechatgateway",
+	"description": "WeChat Gateway",
+	"keywords": [],
+	"license": "Apache-2.0",
+	"type": "project",
+	"require": {
+		"php": ">=7.0.0",
+		"sylingd/yesf-framework": "dev-master"
+	},
+	"repositories": {
+		"packagist": {
+			"type": "composer",
+			"url": "https://packagist.phpcomposer.com"
+		}
+	}
+}
