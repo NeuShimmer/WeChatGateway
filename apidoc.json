@@ -1,0 +1,13 @@
+{
+	"name": "WeChatGateway",
+	"version": "1.0.0",
+	"description": "API documention for WeChatGateway",
+	"title": "WeChatGateway API Docs",
+	"url": "http://shimmer.neusoft.edu.cn/wechat",
+	"sampleUrl": "http://shimmer.neusoft.edu.cn/wechat",
+	"template": {
+		"withCompare": false,
+		"withGenerator": true,
+		"forceLanguage": "zh_cn"
+	}
+}
