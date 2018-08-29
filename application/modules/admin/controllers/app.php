@@ -9,11 +9,10 @@
  * @copyright Copyright (c) 2018 Shimmer Network Studio
  * @license https://github.com/NeuShimmer/WechatGateway/blob/master/LICENSE
  */
-namespace shimmerwx\controller\web;
+namespace shimmerwx\controller\admin;
 use \yesf\library\ControllerAbstract;
 use \shimmerwx\library\Utils;
 use \shimmerwx\library\WeChat;
-use \shimmerwx\model\Config;
 use \shimmerwx\model\App as AppModel;
 
 class App extends ControllerAbstract {

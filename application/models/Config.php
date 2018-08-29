@@ -13,8 +13,8 @@ namespace shimmerwx\model;
 use yesf\library\ModelAbstract;
 
 class Config extends ModelAbstract {
-	protected $table_name = 'config';
-	protected $primary_key = 'id';
+	protected static $_table_name = 'config';
+	protected static $_primary_key = 'id';
 	/**
 	 * 获取单项配置
 	 * 

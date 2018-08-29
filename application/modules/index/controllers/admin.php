@@ -9,7 +9,7 @@
  * @copyright Copyright (c) 2018 Shimmer Network Studio
  * @license https://github.com/NeuShimmer/WechatGateway/blob/master/LICENSE
  */
-namespace shimmerwx\controller\web;
+namespace shimmerwx\controller\index;
 use \yesf\library\ControllerAbstract;
 use \shimmerwx\library\Utils;
 use \shimmerwx\library\WeChat;
@@ -32,20 +32,14 @@ class Admin extends ControllerAbstract {
 	 * @apiSuccess {Boolean} success 是否成功
 	 * @apiSuccess {String} error 失败原因
 	 */
-	public static function adminAction($request, $response) {
+	public static function loginAction($request, $response) {
 		$response->header('Content-Type', 'application/json; charset=UTF-8');
 		$password = $request->post['password'];
 		$encrypt = hash('sha256', $password);
 		if ($encrypt === Config::getInstance()->read('admin_password')) {
-			$response->cookie([
-				'name' => 'wechat_admin',
-				'value' => $encrypt,
-				'expire' => 0,
-				'path' => '/',
-				'domain' => Config::getInstance()->read('cookie_domain'),
-				'httponly' => TRUE
-			]);
-			$response->write(Utils::getWebApiResult([]));
+			$response->write(Utils::getWebApiResult([
+				'password' => $encrypt
+			]));
 		} else {
 			$response->write(Utils::getWebApiResult([
 				'error' => '密码错误'

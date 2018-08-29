@@ -9,7 +9,7 @@
  * @copyright Copyright (c) 2018 Shimmer Network Studio
  * @license https://github.com/NeuShimmer/WechatGateway/blob/master/LICENSE
  */
-namespace shimmerwx\controller\web;
+namespace shimmerwx\controller\admin;
 use \yesf\library\ControllerAbstract;
 use \shimmerwx\library\Utils;
 use \shimmerwx\library\WeChat;
@@ -60,7 +60,7 @@ class Config extends ControllerAbstract {
 	 */
 	public static function saveAction($request, $response) {
 		ConfigModel::getInstance()->save($request->post['id'], $request->post['value']);
-		$response->write(Utils::getWebApiResult([]));
+		$response->write(Utils::getWebApiResult());
 	}
 	/**
 	 * 修改密码
@@ -74,14 +74,8 @@ class Config extends ControllerAbstract {
 	public static function passwordAction($request, $response) {
 		$password = hash('sha256', $request->post['password']);
 		ConfigModel::getInstance()->save('admin_password', $password);
-		$response->cookie([
-			'name' => 'wechat_admin',
-			'value' => $password,
-			'expire' => 0,
-			'path' => '/',
-			'domain' => Config::getInstance()->read('cookie_domain'),
-			'httponly' => TRUE
-		]);
-		$response->write(Utils::getWebApiResult([]));
+		$response->write(Utils::getWebApiResult([
+			'password' => $password
+		]));
 	}
 }

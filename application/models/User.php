@@ -13,6 +13,6 @@ namespace shimmerwx\model;
 use yesf\library\ModelAbstract;
 
 class User extends ModelAbstract {
-	protected $table_name = 'user';
-	protected $primary_key = 'id';
+	protected static $_table_name = 'user';
+	protected static $_primary_key = 'id';
 }

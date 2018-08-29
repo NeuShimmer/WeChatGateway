@@ -76,16 +76,15 @@ class Utils {
 	 * @param array $result
 	 * @return string
 	 */
-	public static function getWebApiResult($result) {
+	public static function getWebApiResult($result = []) {
 		if (isset($result['error'])) {
 			return json_encode([
 				'success' => FALSE,
 				'error' => $result['error']
 			]);
 		} else {
-			return json_encode(array_merge($result, [
-				'success' => TRUE
-			]));
+			$result['success'] = TRUE;
+			return json_encode($result);
 		}
 	}
 	/**

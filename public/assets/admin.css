@@ -1,0 +1,15 @@
+#app .md-app {
+	min-height: 100vh;
+}
+.md-dialog {
+	width: 90%;
+	max-width: 800px;
+}
+.md-button.with-icon .md-icon {
+	margin-right: 6px;
+}
+.config-form {
+	padding-top: 6px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
