@@ -88,6 +88,30 @@ class Utils {
 		}
 	}
 	/**
+	 * 获取微信配置
+	 * 
+	 * @access public
+	 * @param int $id
+	 * @return array
+	 */
+	public static function getWeChatConfig($id = -1) {
+		if ($id === -1) {
+			return [
+				'appid' => Config::getInstance()->read('appid'),
+				'secret' => Config::getInstance()->read('appsecret')
+			];
+		} else {
+			$app = App::getInstance()->get($id);
+			if (!$app) {
+				return NULL;
+			}
+			return [
+				'appid' => $app['appid'],
+				'secret' => $app['appsecret']
+			];
+		}
+	}
+	/**
 	 * 获取微信实例类
 	 * 
 	 * @access public
@@ -95,16 +119,9 @@ class Utils {
 	 * @return object
 	 */
 	public static function getWeChat($id = -1) {
-		if ($id === -1) {
-			$appid = Config::getInstance()->read('appid');
-			$secret = Config::getInstance()->read('appsecret');
-		} else {
-			$app = App::getInstance()->get($id);
-			if (!$app) {
-				return NULL;
-			}
-			$appid = $app['appid'];
-			$secret = $app['appsecret'];
+		$config = self::getWeChatConfig($id);
+		if ($config === NULL) {
+			return NULL;
 		}
 		return WeChat::getInstance($appid, $secret);
 	}

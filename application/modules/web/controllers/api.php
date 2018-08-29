@@ -32,12 +32,20 @@ class Api extends ControllerAbstract {
 	 * @apiSuccess {String} signature 签名
 	 */
 	public static function initAction($request, $response) {
-		$wechat = Utils::getWeChat(isset($request->get['id']) ? $request->get['id'] : -1);
+		$id = isset($request->get['id']) ? $request->get['id'] : -1;
+		$config = Utils::getWeChatConfig($id);
+		if (!$config) {
+			$response->write(Utils::getWebApiResult([
+				'error' => '应用不存在'
+			]));
+			return;
+		}
+		$wechat = Utils::getWeChat($id);
 		$url = $request->get['url'];
 		$randStr = Utils::getRandStr(6);
 		$time = time();
 		$result = [
-			'appid' => '123',
+			'appid' => $config['appid'],
 			'timestamp' => $time,
 			'noncestr' => $randStr,
 			'signature' => $wechat->getJsSign($url, $noncestr, $timestamp)
