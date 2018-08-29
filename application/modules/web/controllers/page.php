@@ -57,27 +57,23 @@ class Page extends ControllerAbstract {
 			'openid' => $token['openid']
 		]);
 		if (!$u) {
-			$u = [
-				'openid' => $openid,
-				'unionid' => isset($user['unionid']) ? $user['unionid'] : '',
-				'nickname' => $user['nickname']
-			];
 			$id = User::getInstance()->add($u);
-			$u['id'] = $id;
 		} else {
 			//更新用户信息
 			User::getInstance()->set([
 				'nickname' => $user['nickname']
 			], $u['id']);
+			$id = $u['id'];
 		}
 		//添加token信息
-		$token = Token::create($u);
+		$user['id'] = $id;
+		$token = Token::create($user);
 		$response->cookie([
 			'name' => 'wechat_token',
 			'value' => $token,
 			'expire' => 0,
 			'path' => '/',
-			'domain' => Config::getInstance()->get('cookie_domain'),
+			'domain' => Config::getInstance()->read('cookie_domain'),
 			'httponly' => TRUE
 		]);
 		$response->assign('title', '完成登录');

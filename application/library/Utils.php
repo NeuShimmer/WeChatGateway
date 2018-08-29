@@ -12,6 +12,7 @@
 namespace shimmerwx\library;
 use Swoole\Coroutine as co;
 use shimmerwx\model\Config;
+use shimmerwx\model\App;
 
 class Utils {
 	const FETCH_GET = 1;
@@ -91,11 +92,21 @@ class Utils {
 	 * 获取微信实例类
 	 * 
 	 * @access public
+	 * @param int $id
 	 * @return object
 	 */
-	public static function getWeChat(): WeChat {
-		$appid = Config::getInstance()->read('appid');
-		$secret = Config::getInstance()->read('appsecret');
+	public static function getWeChat($id = -1) {
+		if ($id === -1) {
+			$appid = Config::getInstance()->read('appid');
+			$secret = Config::getInstance()->read('appsecret');
+		} else {
+			$app = App::getInstance()->get($id);
+			if (!$app) {
+				return NULL;
+			}
+			$appid = $app['appid'];
+			$secret = $app['appsecret'];
+		}
 		return WeChat::getInstance($appid, $secret);
 	}
 }
