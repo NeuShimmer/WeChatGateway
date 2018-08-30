@@ -18,10 +18,7 @@ use shimmerwx\model\User;
 use shimmerwx\model\Token;
 
 class Page extends ControllerAbstract {
-	/**
-	 * 登录页面
-	 * 
-	 */
+	//登录页面
 	public function loginAction($request, $response) {
 		$wechat = Utils::getWeChat();
 		$url = $wechat->getSnsLoginUrl(Config::getInstance()->read('redirect_uri'));
@@ -34,6 +31,7 @@ class Page extends ControllerAbstract {
 		$response->assign('extra_script', 'sessionStorage.setItem("redirect_uri", "' . addslashes($request->get['redirect_uri']) . "');");
 		$response->display('page/redirect');
 	}
+	//登录跳转页面
 	public function redirectAction($request, $response) {
 		$wechat = Utils::getWeChat();
 		$code = $request->get['code'];
@@ -54,10 +52,15 @@ class Page extends ControllerAbstract {
 		$user = $wechat->getSnsUserInfo($token['access_token'], $token['openid']);
 		//检查是否已经存在，建立openid和unionid的对应关系
 		$u = User::getInstance()->get([
-			'openid' => $token['openid']
+			'unionid' => $token['unionid']
 		]);
 		if (!$u) {
-			$id = User::getInstance()->add($u);
+			$id = User::getInstance()->add([
+				'openid' => $user['openid'],
+				'unionid' => $user['unionid'],
+				'nickname' => $user['nickname'],
+				'receive_push' => 1
+			]);
 		} else {
 			//更新用户信息
 			User::getInstance()->set([
@@ -84,4 +87,5 @@ class Page extends ControllerAbstract {
 		$response->assign('extra_script', 'var url=sessionStorage.getItem("redirect_uri");document.getElementById("continue").href=url;setTimeout(()=>{window.location.href=url;},1500);');
 		$response->display('page/redirect');
 	}
+	//用户设置自己是否接收消息推送
 }

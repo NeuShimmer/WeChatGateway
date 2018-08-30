@@ -20,8 +20,9 @@ class Config extends ControllerAbstract {
 	const CONFIG_LIST = [
 		['appid', '默认应用AppID'],
 		['appsecret', '默认应用Secret'],
+		['msg_token', '微信消息推送Token'],
 		['redirect_uri', '登录完成重定向地址'],
-		['cookie_domain', 'Cookie域名'],
+		['cookie_domain', 'Cookie域名']
 	];
 	/**
 	 * 获取配置列表

@@ -54,6 +54,7 @@ INSERT INTO `config` (`id`, `value`) VALUES
 ('admin_password', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'),
 ('appid', ''),
 ('appsecret', ''),
+('msg_token', ''),
 ('cookie_domain', '.example.com'),
 ('redirect_uri', '');
 
@@ -67,7 +68,8 @@ CREATE TABLE `user` (
   `id` bigint(10) UNSIGNED NOT NULL,
   `nickname` varchar(255) NOT NULL,
   `openid` varchar(50) NOT NULL,
-  `unionid` varchar(50) NOT NULL
+  `unionid` varchar(50) NOT NULL,
+  `receive_push` tinyint(1) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --

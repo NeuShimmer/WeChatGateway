@@ -21,7 +21,7 @@ class Api extends ControllerAbstract {
 	 * 
 	 * @api {get} /web/api/init 初始化JS-SDK
 	 * @apiName Init
-	 * @apiGroup Web
+	 * @apiGroup Public
 	 * 
 	 * @apiParam {String} url 页面的完整地址
 	 * @apiParam {Int} id 指定应用ID（与后台对应）
@@ -58,7 +58,7 @@ class Api extends ControllerAbstract {
 	 * 
 	 * @api {get} /web/api/token 通过AuthorizeCode，获取用户信息并生成Token
 	 * @apiName GetToken
-	 * @apiGroup Web
+	 * @apiGroup Public
 	 * 
 	 * @apiParam {String} code AuthorizeCode
 	 * @apiParam {Int} id 指定应用ID（与后台对应）
@@ -90,21 +90,18 @@ class Api extends ControllerAbstract {
 		}
 		//获取用户的基本信息
 		$user = $wechat->getSnsUserInfo($token['access_token'], $token['openid']);
-		//检查是否已经存在，建立openid和unionid的对应关系
+		//因为无法获取与主账号一致的openid，不进行绑定
 		$u = User::getInstance()->get([
-			'openid' => $token['openid']
+			'unionid' => $user['unionid']
 		]);
-		if (!$u) {
-			$id = User::getInstance()->add($u);
-		} else {
+		if ($u) {
 			//更新用户信息
 			User::getInstance()->set([
 				'nickname' => $user['nickname']
 			], $u['id']);
-			$id = $u['id'];
+			$user['id'] = $u['id'];
 		}
 		//添加token信息
-		$user['id'] = $id;
 		$token = Token::create($user);
 		$user['token'] = $token;
 		$response->write(Utils::getWebApiResult($user));
@@ -115,7 +112,7 @@ class Api extends ControllerAbstract {
 	 * 
 	 * @api {get} /web/api/me 获取用户登录状态
 	 * @apiName GetMe
-	 * @apiGroup Web
+	 * @apiGroup Public
 	 * 
 	 * @apiSuccess {Boolean} is_login 是否已经登录
 	 * @apiSuccess {String} openid 用户的OpenID
