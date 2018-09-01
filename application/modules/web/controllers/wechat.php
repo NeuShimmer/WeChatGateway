@@ -117,15 +117,26 @@ class Wechat extends ControllerAbstract {
 		//已存在用户则只开启消息订阅
 		if ($u) {
 			//更新用户信息
-			User::getInstance()->set([
-				'nickname' => $user['nickname'],
-				'receive_push' => 1
-			], $u['id']);
+			if (empty($u['openid'])) {
+				User::getInstance()->set([
+					'openid' => $user['openid'],
+					'nickname' => $user['nickname'],
+					'is_follow' => 1,
+					'receive_push' => 1
+				], $u['id']);
+			} else {
+				User::getInstance()->set([
+					'nickname' => $user['nickname'],
+					'is_follow' => 1,
+					'receive_push' => 1
+				], $u['id']);
+			}
 		} else {
 			User::getInstance()->add([
 				'openid' => $user['openid'],
 				'unionid' => $user['unionid'],
 				'nickname' => $user['nickname'],
+				'is_follow' => 1,
 				'receive_push' => 1
 			]);
 		}
@@ -141,6 +152,7 @@ class Wechat extends ControllerAbstract {
 		if ($u) {
 			//更新用户信息
 			User::getInstance()->set([
+				'is_follow' => 0,
 				'receive_push' => 0
 			], $u['id']);
 		}

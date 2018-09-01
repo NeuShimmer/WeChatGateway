@@ -90,7 +90,6 @@ class Api extends ControllerAbstract {
 		}
 		//获取用户的基本信息
 		$user = $wechat->getSnsUserInfo($token['access_token'], $token['openid']);
-		//因为无法获取与主账号一致的openid，不进行绑定
 		$u = User::getInstance()->get([
 			'unionid' => $user['unionid']
 		]);
@@ -100,6 +99,14 @@ class Api extends ControllerAbstract {
 				'nickname' => $user['nickname']
 			], $u['id']);
 			$user['id'] = $u['id'];
+		} else {
+			$user['id'] = User::getInstance()->add([
+				'openid' => '',
+				'unionid' => $user['unionid'],
+				'nickname' => $user['nickname'],
+				'is_follow' => 0,
+				'receive_push' => 0
+			]);
 		}
 		//添加token信息
 		$token = Token::create($user);
@@ -136,7 +143,9 @@ class Api extends ControllerAbstract {
 			]));
 			return;
 		}
+		//从数据库中读取
+		$user = User::getInstance()->get($info['id']);
 		$info['is_login'] = TRUE;
-		$response->write(Utils::getWebApiResult($info));
+		$response->write(Utils::getWebApiResult(array_merge($info, $user)));
 	}
 }

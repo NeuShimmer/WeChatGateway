@@ -54,19 +54,27 @@ class Page extends ControllerAbstract {
 		$u = User::getInstance()->get([
 			'unionid' => $token['unionid']
 		]);
-		if (!$u) {
+		if ($u) {
+			//更新用户信息
+			if (empty($u['openid'])) {
+				User::getInstance()->set([
+					'openid' => $user['openid'],
+					'nickname' => $user['nickname']
+				], $u['id']);
+			} else {
+				User::getInstance()->set([
+					'nickname' => $user['nickname']
+				], $u['id']);
+			}
+			$id = $u['id'];
+		} else {
 			$id = User::getInstance()->add([
 				'openid' => $user['openid'],
 				'unionid' => $user['unionid'],
 				'nickname' => $user['nickname'],
-				'receive_push' => 1
+				'is_follow' => 0,
+				'receive_push' => 0
 			]);
-		} else {
-			//更新用户信息
-			User::getInstance()->set([
-				'nickname' => $user['nickname']
-			], $u['id']);
-			$id = $u['id'];
 		}
 		//添加token信息
 		$user['id'] = $id;

@@ -69,6 +69,7 @@ CREATE TABLE `user` (
   `nickname` varchar(255) NOT NULL,
   `openid` varchar(50) NOT NULL,
   `unionid` varchar(50) NOT NULL,
+  `is_follow` tinyint(1) UNSIGNED NOT NULL,
   `receive_push` tinyint(1) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
