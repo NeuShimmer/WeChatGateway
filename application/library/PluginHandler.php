@@ -17,7 +17,7 @@ use shimmerwx\model\Config;
 class PluginHandler {
 	public static function onBeforeDispatcher($module, $controller, $action, $request, $response) {
 		if ($module === 'index' || ($module === 'web' && $controller === 'page')) {
-			$response->assign('__PUBLIC_URL', Yesf::app()->getConfig('application.public'));
+			$response->assign('__PUBLIC_URL', Yesf::app()->getConfig('public'));
 		}
 		if ($module === 'web' && $controller === 'api') {
 			$response->header('Content-Type', 'application/json; charset=UTF-8');
