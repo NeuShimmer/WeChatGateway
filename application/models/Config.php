@@ -15,6 +15,12 @@ use yesf\library\ModelAbstract;
 class Config extends ModelAbstract {
 	protected static $_table_name = 'config';
 	protected static $_primary_key = 'id';
+	protected $cache = NULL;
+	public function __construct() {
+		$this->cache = \Swoole\Table(32);
+		$this->cache->column('value', \Swoole\Table::TYPE_STRING, 255);
+		parent::__construct();
+	}
 	/**
 	 * 获取单项配置
 	 * 
@@ -23,7 +29,14 @@ class Config extends ModelAbstract {
 	 * @return string
 	 */
 	public function read($name) {
+		$rs = $this->cache->get($name, 'value');
+		if ($rs !== FALSE) {
+			return $rs;
+		}
 		$result = $this->get($name, ['value']);
+		$this->cache->set($name, [
+			'value' => $result['value']
+		]);
 		return $result['value'];
 	}
 	/**
@@ -34,8 +47,9 @@ class Config extends ModelAbstract {
 	 * @param string $value
 	 */
 	public function save($name, $value) {
-		$this->set([
+		$this->cache[$name] = $value;
+		$this->cache->set($name, [
 			'value' => $value
-		], $name);
+		]);
 	}
 }
