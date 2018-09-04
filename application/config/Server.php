@@ -2,7 +2,7 @@
 return [
 	'ip' => "0.0.0.0",
 	'port' => 9505,
-	'pid' => "/tmp",
+	'pid' => "/var/run/",
 	'advanced' => [
 		'daemonize' => 0,
 		'dispatch_mode' => 2, 

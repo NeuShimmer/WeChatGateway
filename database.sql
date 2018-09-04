@@ -56,6 +56,7 @@ INSERT INTO `config` (`id`, `value`) VALUES
 ('appsecret', ''),
 ('msg_token', ''),
 ('cookie_domain', '.example.com'),
+('subscribe_message', ''),
 ('redirect_uri', '');
 
 -- --------------------------------------------------------

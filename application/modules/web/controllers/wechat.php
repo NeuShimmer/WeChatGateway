@@ -108,6 +108,7 @@ class Wechat extends ControllerAbstract {
 	}
 	//事件推送：订阅
 	protected static function onEventSubscribe($data) {
+		$myid = strval($data->ToUserName);
 		$openid = strval($data->FromUserName);
 		//获取用户信息，包括unionid
 		$user = $wechat->getUserInfo($openid);
@@ -140,7 +141,21 @@ class Wechat extends ControllerAbstract {
 				'receive_push' => 1
 			]);
 		}
-		return 'success';
+		//发送欢迎消息
+		$msg = Config::getInstance()->read('subscribe_message');
+		if (!empty($msg)) {
+			return <<<EOF
+<xml>
+	<ToUserName><![CDATA[{$openid}]]></ToUserName>
+	<FromUserName><![CDATA[{$myid}]]></FromUserName>
+	<CreateTime>{time()}</CreateTime>
+	<MsgType><![CDATA[text]]></MsgType>
+	<Content><![CDATA[{$msg}]]></Content>
+</xml>
+EOF;
+		} else {
+			return 'success';
+		}
 	}
 	//事件推送：取消订阅
 	protected static function onEventUnsubscribe($data) {

@@ -22,7 +22,8 @@ class Config extends ControllerAbstract {
 		['appsecret', '默认应用Secret'],
 		['msg_token', '微信消息推送Token'],
 		['redirect_uri', '登录完成重定向地址'],
-		['cookie_domain', 'Cookie域名']
+		['cookie_domain', 'Cookie域名'],
+		['subscribe_message', '欢迎消息（关注时发送）']
 	];
 	/**
 	 * 获取配置列表
