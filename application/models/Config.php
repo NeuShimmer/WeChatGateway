@@ -17,8 +17,9 @@ class Config extends ModelAbstract {
 	protected static $_primary_key = 'id';
 	protected $cache = NULL;
 	public function __construct() {
-		$this->cache = \Swoole\Table(32);
+		$this->cache = new \Swoole\Table(32);
 		$this->cache->column('value', \Swoole\Table::TYPE_STRING, 255);
+		$this->cache->create();
 		parent::__construct();
 	}
 	/**
@@ -47,7 +48,9 @@ class Config extends ModelAbstract {
 	 * @param string $value
 	 */
 	public function save($name, $value) {
-		$this->cache[$name] = $value;
+		$this->set([
+			'value' => $value
+		], $name);
 		$this->cache->set($name, [
 			'value' => $value
 		]);

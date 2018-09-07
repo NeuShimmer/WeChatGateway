@@ -198,7 +198,7 @@ class WeChat {
 	 * @return string
 	 */
 	public function getSnsLoginUrl($redirect_uri, $state = 'shimmer') {
-		return 'https://open.weixin.qq.com/connect/oauth2/authorize' . http_build_query([
+		return 'https://open.weixin.qq.com/connect/oauth2/authorize?' . http_build_query([
 			'appid' => $this->appid,
 			'redirect_uri' => $redirect_uri,
 			'response_type' => 'code',

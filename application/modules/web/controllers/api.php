@@ -14,6 +14,7 @@ use \yesf\library\ControllerAbstract;
 use \shimmerwx\library\Utils;
 use \shimmerwx\library\WeChat;
 use \shimmerwx\model\Token;
+use \shimmerwx\model\User;
 
 class Api extends ControllerAbstract {
 	/**

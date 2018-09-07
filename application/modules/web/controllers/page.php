@@ -19,7 +19,7 @@ use shimmerwx\model\Token;
 
 class Page extends ControllerAbstract {
 	//登录页面
-	public function loginAction($request, $response) {
+	public static function loginAction($request, $response) {
 		$wechat = Utils::getWeChat();
 		$url = $wechat->getSnsLoginUrl(Config::getInstance()->read('redirect_uri'));
 		$response->assign('title', '登录');
@@ -28,11 +28,11 @@ class Page extends ControllerAbstract {
 		$response->assign('time', 500);
 		$response->assign('type', 'wait');
 		$response->assign('url', $url);
-		$response->assign('extra_script', 'sessionStorage.setItem("redirect_uri", "' . addslashes($request->get['redirect_uri']) . "');");
+		$response->assign('extra_script', 'sessionStorage.setItem("redirect_uri", decodeURIComponent("' . urlencode($request->get['redirect_uri']) . '"));');
 		$response->display('page/redirect');
 	}
 	//登录跳转页面
-	public function redirectAction($request, $response) {
+	public static function redirectAction($request, $response) {
 		$wechat = Utils::getWeChat();
 		$code = $request->get['code'];
 		$token = $wechat->getSnsAccessToken($code);
@@ -92,7 +92,7 @@ class Page extends ControllerAbstract {
 		$response->assign('desc', '正在前往登录前页面');
 		$response->assign('type', 'success');
 		$response->assign('url', '');
-		$response->assign('extra_script', 'var url=sessionStorage.getItem("redirect_uri");document.getElementById("continue").href=url;setTimeout(()=>{window.location.href=url;},1500);');
+		$response->assign('extra_script', 'var url=sessionStorage.getItem("redirect_uri");document.getElementById("continue").href=url;setTimeout(()=>{window.location.href=url;},1000);');
 		$response->display('page/redirect');
 	}
 	//用户设置自己是否接收消息推送

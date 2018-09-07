@@ -41,7 +41,7 @@ class Token {
 	 * @return string
 	 */
 	public static function create($user) {
-		$token = hash(uniqid(Utils::getRandStr(4), TRUE), 'sha256');
+		$token = hash('sha256', uniqid(Utils::getRandStr(4), TRUE));
 		Cache::set('token_' . $token, $user, self::EXPIRE);
 		return $token;
 	}

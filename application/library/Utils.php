@@ -123,6 +123,6 @@ class Utils {
 		if ($config === NULL) {
 			return NULL;
 		}
-		return WeChat::getInstance($appid, $secret);
+		return WeChat::getInstance($config['appid'], $config['secret']);
 	}
 }
