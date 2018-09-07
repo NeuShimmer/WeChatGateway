@@ -28,7 +28,7 @@ class Token {
 	public static function get($token) {
 		$result = Cache::get('token_' . $token);
 		if ($result) {
-			Cache::set('token_' . $token, $result, self::EXPIRE);
+			Cache::ttl('token_' . $token, self::EXPIRE);
 			return $result;
 		}
 		return NULL;

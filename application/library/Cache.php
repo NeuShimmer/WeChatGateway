@@ -21,4 +21,7 @@ class Cache {
 	public static function set($k, $v, $ttl = 7200) {
 		Database::get('redis')->set(self::PREFIX . $k, swoole_serialize($v), $ttl);
 	}
+	public static function ttl($k, $ttl = 7200) {
+		Database::get('redis')->expire(self::PREFIX . $k, $ttl);
+	}
 }
