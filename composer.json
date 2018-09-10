@@ -7,11 +7,5 @@
 	"require": {
 		"php": ">=7.0.0",
 		"sylingd/yesf-framework": "1.0.0"
-	},
-	"repositories": {
-		"packagist": {
-			"type": "composer",
-			"url": "https://packagist.phpcomposer.com"
-		}
 	}
 }
