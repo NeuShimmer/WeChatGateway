@@ -13,6 +13,7 @@ namespace shimmerwx\controller\web;
 use \yesf\library\ControllerAbstract;
 use \shimmerwx\library\Utils;
 use \shimmerwx\model\Token;
+use \shimmerwx\model\Config;
 
 class Wechat extends ControllerAbstract {
 	public static function pushAction($request, $response) {

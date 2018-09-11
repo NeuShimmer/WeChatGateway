@@ -6,6 +6,11 @@
 	"type": "project",
 	"require": {
 		"php": ">=7.0.0",
-		"sylingd/yesf-framework": "1.0.0"
+		"sylingd/yesf-framework": "^1.0"
+	},
+	"config": {
+		"preferred-install": "dist",
+		"sort-packages": true,
+		"optimize-autoloader": true
 	}
 }
