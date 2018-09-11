@@ -26,7 +26,7 @@ class Wechat extends ControllerAbstract {
 			$arr = [$token, $time, $nonce];
 			sort($arr, SORT_STRING);
 			if (sha1(implode('', $arr)) === $request->get['signature']) {
-				$response->write('success');
+				$response->write($request->get['echostr']);
 			} else {
 				$response->write('fail');
 			}
@@ -109,6 +109,7 @@ class Wechat extends ControllerAbstract {
 	}
 	//事件推送：订阅
 	protected static function onEventSubscribe($data) {
+		$wechat = Utils::getWeChat();
 		$myid = strval($data->ToUserName);
 		$openid = strval($data->FromUserName);
 		//获取用户信息，包括unionid
