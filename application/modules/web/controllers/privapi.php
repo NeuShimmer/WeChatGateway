@@ -61,12 +61,9 @@ class Privapi extends ControllerAbstract {
 			return;
 		}
 		$set = [];
-		echo "POST:\n";
-		var_dump($request->post);
 		if (isset($request->post['receive_push'])) {
 			$set['receive_push'] = $request->post['receive_push'] == 1 ? 1 : 0;
 		}
-		var_dump($set);
 		if (count($set) > 0) {
 			User::getInstance()->set($set, $user['id']);
 		}
