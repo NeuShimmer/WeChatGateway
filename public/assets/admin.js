@@ -13,7 +13,14 @@ function Api(param) {
 			url += '?' + (new URLSearchParams(param.query)).toString();
 		}
 		if (fetchParam.method === 'POST') {
-			fetchParam.body = new URLSearchParams(param.post);
+			fetchParam.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
+			const formBody = [];
+			for (const property in param.post) {
+				const encodedKey = encodeURIComponent(property);
+				const encodedValue = encodeURIComponent(param.post[property]);
+  				formBody.push(encodedKey + "=" + encodedValue);
+			}
+			fetchParam.body = formBody.join("&");
 		}
 		fetch(url, fetchParam)
 		.then(r => r.json())

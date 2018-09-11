@@ -20,6 +20,21 @@ use shimmerwx\model\Token;
 class Page extends ControllerAbstract {
 	//登录页面
 	public static function loginAction($request, $response) {
+		//如果已经处于登录状态，则直接跳转到目标页面
+		$token = $request->cookie['wechat_token'];
+		if ($token) {
+			$info = Token::get($token);
+			if ($info) {
+				$response->assign('title', '完成登录');
+				$response->assign('message', '登录成功');
+				$response->assign('desc', '正在前往登录前页面');
+				$response->assign('type', 'success');
+				$response->assign('time', 500);
+				$response->assign('url', $request->get['redirect_uri']);
+				$response->display('page/redirect');
+				return;
+			}
+		}
 		$wechat = Utils::getWeChat();
 		$url = $wechat->getSnsLoginUrl(Config::getInstance()->read('redirect_uri'));
 		$response->assign('title', '登录');
@@ -95,5 +110,8 @@ class Page extends ControllerAbstract {
 		$response->assign('extra_script', 'var url=sessionStorage.getItem("redirect_uri");document.getElementById("continue").href=url;setTimeout(()=>{window.location.href=url;},1000);');
 		$response->display('page/redirect');
 	}
-	//用户设置自己是否接收消息推送
+	//用户设置
+	public static function settingAction($request, $response) {
+		$response->display('page/setting');
+	}
 }

@@ -21,4 +21,22 @@
 
 * 修改`application/Bootstrap.php`中的`Yesf::setBaseUri('/wechat/');`部分为您实际部署的路径
 
+* 修改WeUI相关文件路径（见下文）
+
 * 进入后台（`/index/admin/index`），输入默认密码`admin`，进行进一步配置
+
+### 修改WeUI相关文件路径
+
+* 用户可选择将WeUI文件下载至本地，或直接使用在线文件：
+
+```
+https://res.wx.qq.com/open/libs/weuijs/1.1.4/weui.min.js
+https://res.wx.qq.com/open/libs/weui/1.1.3/weui.min.css
+```
+
+* 修改以下几处文件中的相关地址：
+
+```
+application/modules/web/views/page/redirect.phtml
+application/modules/web/views/page/setting.phtml
+```

@@ -14,6 +14,7 @@ use \yesf\library\ControllerAbstract;
 use \shimmerwx\library\Utils;
 use \shimmerwx\library\WeChat;
 use \shimmerwx\model\Token;
+use \shimmerwx\model\User;
 
 class Privapi extends ControllerAbstract {
 	private static function checkLogin($request, $response) {
@@ -25,21 +26,50 @@ class Privapi extends ControllerAbstract {
 			]));
 			return FALSE;
 		}
-		return $info;
+		//从数据库中读取
+		$user = User::getInstance()->get($info['id']);
+		return array_merge($info, $user);
 	}
 	/**
-	 * 设置是否接受推送
+	 * 获取选项
 	 * 
-	 * @api {get} /web/privapi/setPush 设置是否接受推送
-	 * @apiName SetPush
+	 * @api {get} /web/privapi/getSetting 获取选项
+	 * @apiName GetSetting
 	 * @apiGroup Public
 	 * 
-	 * @apiParam {Int} receive 是否接受推送
+	 * @apiSuccess {Int} receive_push 是否接受推送
 	 */
-	public static function setPushAction($request, $response) {
+	public static function getSettingAction($request, $response) {
 		if (($user = self::checkLogin($request, $response)) === FALSE) {
 			return;
 		}
-		//
+		$response->write(Utils::getWebApiResult([
+			'receive_push' => $user['receive_push'] ? 1 : 0
+		]));
+	}
+	/**
+	 * 保存设置
+	 * 
+	 * @api {post} /web/privapi/setSetting 保存设置
+	 * @apiName setSetting
+	 * @apiGroup Public
+	 * 
+	 * @apiParam {Int} receive_push 是否接受推送
+	 */
+	public static function setSettingAction($request, $response) {
+		if (($user = self::checkLogin($request, $response)) === FALSE) {
+			return;
+		}
+		$set = [];
+		echo "POST:\n";
+		var_dump($request->post);
+		if (isset($request->post['receive_push'])) {
+			$set['receive_push'] = $request->post['receive_push'] == 1 ? 1 : 0;
+		}
+		var_dump($set);
+		if (count($set) > 0) {
+			User::getInstance()->set($set, $user['id']);
+		}
+		$response->write(Utils::getWebApiResult());
 	}
 }

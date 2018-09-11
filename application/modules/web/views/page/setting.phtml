@@ -1,0 +1,29 @@
+<?php
+use yesf\Yesf;
+?>
+<!DOCTYPE html>
+<html>
+<head>
+	<title>设置</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<link href="//shimmer.neusoft.edu.cn/h/lib/weui/1.1.3.css" rel="stylesheet">
+</head>
+<body>
+	<div class="weui-cells__title">基本设置</div>
+	<div class="weui-cells weui-cells_form">
+		<div class="weui-cell weui-cell_switch">
+			<div class="weui-cell__bd">接收消息推送</div>
+			<div class="weui-cell__ft">
+				<input id="setting-push" class="weui-switch" type="checkbox">
+			</div>
+		</div>
+	</div>
+	<div class="weui-btn-area">
+        <button id="setting-save" class="weui-btn weui-btn_primary">保存</button>
+    </div>
+	<script>var BASE_URI='<?=Yesf::getBaseUri()?>';</script>
+	<script src="//shimmer.neusoft.edu.cn/h/lib/weui.js/1.1.4.js"></script>
+	<script src="<?=$__PUBLIC_URL?>public.js"></script>
+</body>
+</html>
