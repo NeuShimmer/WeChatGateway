@@ -35,7 +35,7 @@ class Privapi extends ControllerAbstract {
 	 * 
 	 * @api {get} /web/privapi/getSetting 获取选项
 	 * @apiName GetSetting
-	 * @apiGroup Public
+	 * @apiGroup Private
 	 * 
 	 * @apiSuccess {Int} receive_push 是否接受推送
 	 */
@@ -52,7 +52,7 @@ class Privapi extends ControllerAbstract {
 	 * 
 	 * @api {post} /web/privapi/setSetting 保存设置
 	 * @apiName setSetting
-	 * @apiGroup Public
+	 * @apiGroup Private
 	 * 
 	 * @apiParam {Int} receive_push 是否接受推送
 	 */

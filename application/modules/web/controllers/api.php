@@ -25,7 +25,7 @@ class Api extends ControllerAbstract {
 	 * @apiGroup Public
 	 * 
 	 * @apiParam {String} url 页面的完整地址
-	 * @apiParam {Int} id 指定应用ID（与后台对应）
+	 * @apiParam {Int} id 指定应用ID（可选，-1代表默认应用，与后台对应）
 	 * 
 	 * @apiSuccess {String} appid AppID
 	 * @apiSuccess {String} timestamp 时间戳
@@ -33,7 +33,7 @@ class Api extends ControllerAbstract {
 	 * @apiSuccess {String} signature 签名
 	 */
 	public static function initAction($request, $response) {
-		$id = isset($request->get['id']) ? $request->get['id'] : -1;
+		$id = isset($request->get['id']) ? intval($request->get['id']) : -1;
 		$config = Utils::getWeChatConfig($id);
 		if (!$config) {
 			$response->write(Utils::getWebApiResult([
@@ -49,7 +49,7 @@ class Api extends ControllerAbstract {
 			'appid' => $config['appid'],
 			'timestamp' => $time,
 			'noncestr' => $randStr,
-			'signature' => $wechat->getJsSign($url, $noncestr, $timestamp)
+			'signature' => $wechat->getJsSign($url, $randStr, $time)
 		];
 		$response->write(Utils::getWebApiResult($result));
 	}
