@@ -18,7 +18,15 @@ use shimmerwx\model\User;
 use shimmerwx\model\Token;
 
 class Page extends ControllerAbstract {
-	//登录页面
+	/**
+	 * 登录页面
+	 * 
+	 * @api {get} /web/page/login 登录页面
+	 * @apiName Login
+	 * @apiGroup Web
+	 * 
+	 * @apiParam {String} redirect_uri 登录完成回调地址
+	 */
 	public static function loginAction($request, $response) {
 		//如果已经处于登录状态，则直接跳转到目标页面
 		$token = $request->cookie['wechat_token'];

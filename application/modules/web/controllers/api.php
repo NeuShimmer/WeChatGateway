@@ -122,6 +122,8 @@ class Api extends ControllerAbstract {
 	 * @apiName GetMe
 	 * @apiGroup Public
 	 * 
+	 * @apiParam {String} token 系统生成的Token，可选，默认从Cookie中读取
+	 * 
 	 * @apiSuccess {Boolean} is_login 是否已经登录
 	 * @apiSuccess {String} openid 用户的OpenID
 	 * @apiSuccess {String} unionid 用户的UnionID
@@ -130,13 +132,18 @@ class Api extends ControllerAbstract {
 	 * @apiSuccess {Int} sex 用户性别，值为1时是男性，值为2时是女性，值为0时是未知
 	 */
 	public static function meAction($request, $response) {
-		if (!isset($request->cookie['wechat_token'])) {
+		if (isset($request->get['token']) && !empty($request->get['token'])) {
+			$token = $request->get['token'];
+		}
+		if (isset($request->cookie['wechat_token']) && !empty($request->cookie['wechat_token'])) {
+			$token = $request->cookie['wechat_token'];
+		}
+		if (!isset($token)) {
 			$response->write(Utils::getWebApiResult([
 				'is_login' => FALSE
 			]));
 			return;
 		}
-		$token = $request->cookie['wechat_token'];
 		$info = Token::get($token);
 		if (!$info) {
 			$response->write(Utils::getWebApiResult([
