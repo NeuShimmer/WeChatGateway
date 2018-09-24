@@ -156,4 +156,12 @@ class Api extends ControllerAbstract {
 		$info['is_login'] = TRUE;
 		$response->write(Utils::getWebApiResult(array_merge($info, $user)));
 	}
+	/**
+	 * 获取媒体文件
+	 * @api {get} /web/api/media 获取媒体文件
+	 * @apiName GetMedia
+	 * @apiGroup Public
+	 * 
+	 * @apiParam {Int} id 通过JSSDK上传接口得到的媒体文件ID
+	 */
 }

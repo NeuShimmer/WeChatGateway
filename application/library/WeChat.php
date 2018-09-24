@@ -11,10 +11,11 @@
  * @license https://github.com/NeuShimmer/WechatGateway/blob/master/LICENSE
  */
 namespace shimmerwx\library;
+
+use Swlib\Saber;
+
 class WeChat {
-	const WECHAT_HOST = 'api.weixin.qq.com';
-	const WECHAT_PORT = 443;
-	const WECHAT_HTTPS = TRUE;
+	const WECHAT_URL = 'https://api.weixin.qq.com/';
 	private $appid;
 	private $secret;
 	/**
@@ -33,29 +34,25 @@ class WeChat {
 	 * @access private
 	 * @param string $name
 	 * @param array $param
+	 * @param array $post
+	 * @param boolean $sns
 	 * @return array
 	 */
-	private function callApi($name, $param = NULL, $post = NULL) {
-		return Utils::fetchUrl([
-			'type' => $post === NULL ? Utils::FETCH_GET : Utils::FETCH_POST,
-			'host' => self::WECHAT_HOST,
-			'port' => self::WECHAT_PORT,
-			'is_https' => self::WECHAT_HTTPS,
-			'is_json' => TRUE,
-			'path' => '/cgi-bin/' . $name . (is_array($param) ? '?' . http_build_query($param) : ''),
-			'post' => $post === NULL ? NULL : json_encode($post),
-			'post_type' => 'application/json'
-		]);
-	}
-	private function callSnsApi($name, $param = NULL) {
-		return Utils::fetchUrl([
-			'type' => Utils::FETCH_GET,
-			'host' => self::WECHAT_HOST,
-			'port' => self::WECHAT_PORT,
-			'is_https' => self::WECHAT_HTTPS,
-			'is_json' => TRUE,
-			'path' => '/sns/' . $name . (is_array($param) ? '?' . http_build_query($param) : '')
-		]);
+	private function callApi($name, $param = NULL, $post = NULL, $sns = FALSE, $is_json = TRUE) {
+		static $client = NULL;
+		if ($client === NULL) {
+			$client = Saber::create([
+				'base_uri' => self::WECHAT_URL,
+				'use_pool' => 10
+			]);
+		}
+		$url = ($sns ? '/sns' : '/cgi-bin') . '/' . $name;
+		if ($post === NULL) {
+			$result = self::getSaber()->get($url . (is_array($param) ? '?' . http_build_query($param) : ''));
+		} else {
+			$result = self::getSaber()->post($url, json_encode($post));
+		}
+		return $is_json ? $result->getParsedJson() : strval($result);
 	}
 	/**
 	 * 初始化
@@ -190,6 +187,23 @@ class WeChat {
 		]);
 	}
 	/**
+	 * 获取已上传的多媒体资源
+	 * 
+	 * @access public
+	 * @param int $id
+	 * @param string $access_token
+	 * @return string
+	 */
+	public function getMedia($id, $access_token = NULL) {
+		if ($access_token === NULL) {
+			$access_token = $this->getAccessToken();
+		}
+		return $this->callApi('media/get', [
+			'access_token' => $access_token,
+			'media_id' => $id
+		], NULL, FALSE, FALSE);
+	}
+	/**
 	 * SNS接口：获取登录地址
 	 * 
 	 * @access public
@@ -214,12 +228,12 @@ class WeChat {
 	 * @return array
 	 */
 	public function getSnsAccessToken($code) {
-		return $this->callSnsApi('oauth2/access_token', [
+		return $this->callApi('oauth2/access_token', [
 			'appid' => $this->appid,
 			'secret' => $this->secret,
 			'code' => $code,
 			'grant_type' => 'authorization_code'
-		]);
+		], NULL, TRUE);
 	}
 	/**
 	 * SNS接口：获取用户信息
@@ -230,11 +244,11 @@ class WeChat {
 	 * @return array
 	 */
 	public function getSnsUserInfo($access_token, $openid) {
-		return $this->callSnsApi('userinfo', [
+		return $this->callApi('userinfo', [
 			'access_token' => $access_token,
 			'openid' => $openid,
 			'lang' => 'zh_CN'
-		]);
+		], NULL, TRUE);
 	}
 	/**
 	 * SNS接口：刷新AccessToken
@@ -244,10 +258,10 @@ class WeChat {
 	 * @return array
 	 */
 	public function getSnsNewAccessToken($refresh_token) {
-		return $this->callSnsApi('oauth2/refresh_token', [
+		return $this->callApi('oauth2/refresh_token', [
 			'appid' => $this->appid,
 			'refresh_token' => $refresh_token,
 			'grant_type' => 'refresh_token'
-		]);
+		], NULL, TRUE);
 	}
 }
