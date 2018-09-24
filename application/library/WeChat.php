@@ -29,6 +29,22 @@ class WeChat {
 		return self::$_instance[$appid];
 	}
 	/**
+	 * 获取Saber实例类
+	 * 
+	 * @access private
+	 * @return object
+	 */
+	private static function getSaber() {
+		static $client = NULL;
+		if ($client === NULL) {
+			$client = Saber::create([
+				'base_uri' => self::WECHAT_URL,
+				'use_pool' => 10
+			]);
+		}
+		return $client;
+	}
+	/**
 	 * 调用微信API
 	 * 
 	 * @access private
@@ -38,21 +54,15 @@ class WeChat {
 	 * @param boolean $sns
 	 * @return array
 	 */
-	private function callApi($name, $param = NULL, $post = NULL, $sns = FALSE, $is_json = TRUE) {
-		static $client = NULL;
-		if ($client === NULL) {
-			$client = Saber::create([
-				'base_uri' => self::WECHAT_URL,
-				'use_pool' => 10
-			]);
-		}
+	private static function callApi($name, $param = NULL, $post = NULL, $sns = FALSE) {
+		$client = self::getSaber();
 		$url = ($sns ? '/sns' : '/cgi-bin') . '/' . $name;
 		if ($post === NULL) {
 			$result = $client->get($url . (is_array($param) ? '?' . http_build_query($param) : ''));
 		} else {
 			$result = $client->post($url, json_encode($post));
 		}
-		return $is_json ? $result->getParsedJsonArray() : strval($result);
+		return $result->getParsedJsonArray();
 	}
 	/**
 	 * 初始化
@@ -76,7 +86,7 @@ class WeChat {
 			$res = NULL;
 		}
 		if (empty($res['access_token'])) {
-			$res = $this->callApi('token', [
+			$res = self::callApi('token', [
 				'grant_type' => 'client_credential',
 				'appid' => $this->appid,
 				'secret' => $this->secret
@@ -102,7 +112,7 @@ class WeChat {
 			$res = NULL;
 		}
 		if (empty($res['ticket'])) {
-			$res = $this->callApi('ticket/getticket', [
+			$res = self::callApi('ticket/getticket', [
 				'access_token' => $access_token,
 				'type' => 'jsapi'
 			]);
@@ -164,7 +174,7 @@ class WeChat {
 		if (is_array($mini_prog)) {
 			$data['miniprogram'] = $mini_prog;
 		}
-		$this->callApi('message/template/send', [
+		self::callApi('message/template/send', [
 			'access_token' => $access_token
 		], $data);
 	}
@@ -180,7 +190,7 @@ class WeChat {
 		if ($access_token === NULL) {
 			$access_token = $this->getAccessToken();
 		}
-		return $this->callApi('user/info', [
+		return self::callApi('user/info', [
 			'access_token' => $access_token,
 			'openid' => $openid,
 			'lang' => 'zh_CN'
@@ -192,16 +202,20 @@ class WeChat {
 	 * @access public
 	 * @param int $id
 	 * @param string $access_token
-	 * @return string
+	 * @return array
 	 */
 	public function getMedia($id, $access_token = NULL) {
 		if ($access_token === NULL) {
 			$access_token = $this->getAccessToken();
 		}
-		return $this->callApi('media/get', [
+		$client = self::getSaber();
+		$result = $client->get('/cgi-bin/media/get?' . http_build_query([
 			'access_token' => $access_token,
 			'media_id' => $id
-		], NULL, FALSE, FALSE);
+		]));
+		$content_type = $result->getHeader('content-type')[0];
+		$body = strval($result->getBody());
+		return [$content_type, $body];
 	}
 	/**
 	 * SNS接口：获取登录地址
@@ -228,7 +242,7 @@ class WeChat {
 	 * @return array
 	 */
 	public function getSnsAccessToken($code) {
-		return $this->callApi('oauth2/access_token', [
+		return self::callApi('oauth2/access_token', [
 			'appid' => $this->appid,
 			'secret' => $this->secret,
 			'code' => $code,
@@ -244,7 +258,7 @@ class WeChat {
 	 * @return array
 	 */
 	public function getSnsUserInfo($access_token, $openid) {
-		return $this->callApi('userinfo', [
+		return self::callApi('userinfo', [
 			'access_token' => $access_token,
 			'openid' => $openid,
 			'lang' => 'zh_CN'
@@ -258,7 +272,7 @@ class WeChat {
 	 * @return array
 	 */
 	public function getSnsNewAccessToken($refresh_token) {
-		return $this->callApi('oauth2/refresh_token', [
+		return self::callApi('oauth2/refresh_token', [
 			'appid' => $this->appid,
 			'refresh_token' => $refresh_token,
 			'grant_type' => 'refresh_token'

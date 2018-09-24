@@ -19,7 +19,7 @@ class PluginHandler {
 		if ($module === 'index' || ($module === 'web' && $controller === 'page')) {
 			$response->assign('__PUBLIC_URL', Yesf::app()->getConfig('public'));
 		}
-		if ($module === 'web' && $controller === 'api') {
+		if ($module === 'web' && $controller === 'api' && $action !== 'media') {
 			$response->header('Content-Type', 'application/json; charset=UTF-8');
 		}
 		if ($module === 'admin') {

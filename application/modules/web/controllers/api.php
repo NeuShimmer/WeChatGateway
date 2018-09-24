@@ -162,6 +162,45 @@ class Api extends ControllerAbstract {
 	 * @apiName GetMedia
 	 * @apiGroup Public
 	 * 
-	 * @apiParam {Int} id 通过JSSDK上传接口得到的媒体文件ID
+	 * @apiParam {Int} id 指定应用ID（与后台对应）
+	 * @apiParam {String} media_id 通过JSSDK上传接口得到的媒体文件ID
 	 */
+	public static function mediaAction($request, $response) {
+		$media_id = $request->get['media_id'];
+		$id = isset($request->get['id']) ? intval($request->get['id']) : -1;
+		$config = Utils::getWeChatConfig($id);
+		if (!$config) {
+			$response->write(Utils::getWebApiResult([
+				'error' => '应用不存在'
+			]));
+			return;
+		}
+		$wechat = Utils::getWeChat($id);
+		$retry_count = 0;
+		while (TRUE) {
+			list($content_type, $body) = $wechat->getMedia($media_id);
+			if (strpos($content_type, 'application/json') === 0) {
+				$response->header('Content-Type', 'application/json; charset=UTF-8');
+				$result = json_decode($body, 1);
+				if ($result['errcode'] == 40001) {
+					//临时失败
+					if ($retry_count++ >= 10) {
+						$response->write(Utils::getWebApiResult([
+							'error' => '请重试'
+						]));
+						return;
+					}
+				} else {
+					$response->write(Utils::getWebApiResult([
+						'error' => $result['errmsg']
+					]));
+					return;
+				}
+			} else {
+				break;
+			}
+		}
+		$response->header('Content-Type', $content_type);
+		$response->write($body);
+	}
 }
