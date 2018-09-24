@@ -48,11 +48,11 @@ class WeChat {
 		}
 		$url = ($sns ? '/sns' : '/cgi-bin') . '/' . $name;
 		if ($post === NULL) {
-			$result = self::getSaber()->get($url . (is_array($param) ? '?' . http_build_query($param) : ''));
+			$result = $client->get($url . (is_array($param) ? '?' . http_build_query($param) : ''));
 		} else {
-			$result = self::getSaber()->post($url, json_encode($post));
+			$result = $client->post($url, json_encode($post));
 		}
-		return $is_json ? $result->getParsedJson() : strval($result);
+		return $is_json ? $result->getParsedJsonArray() : strval($result);
 	}
 	/**
 	 * 初始化
