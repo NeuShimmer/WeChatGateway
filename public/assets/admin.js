@@ -33,7 +33,6 @@ new Vue({
 	data: function() {
 		return {
 			status: 0,
-			menuVisible: false,
 			activePage: "config",
 			password: "",
 			config: [],
@@ -71,7 +70,6 @@ new Vue({
 		},
 		switchPage: function(name) {
 			this.activePage = name;
-			this.menuVisible = false;
 		},
 		tryLogin: function() {
 			const _this = this;

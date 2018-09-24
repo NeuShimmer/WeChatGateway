@@ -16,14 +16,11 @@ use yesf\Yesf;
 </head>
 <body>
 	<div id="app">
-		<md-app md-mode="reveal">
+		<md-app md-waterfall md-mode="fixed">
 			<md-app-toolbar class="md-primary">
-				<md-button class="md-icon-button" @click="menuVisible = !menuVisible">
-					<md-icon>menu</md-icon>
-				</md-button>
 				<span class="md-title">WeChatGateway管理面板</span>
 			</md-app-toolbar>
-			<md-app-drawer :md-active.sync="menuVisible">
+			<md-app-drawer md-permanent="full">
 				<md-list>
 					<md-list-item @click="switchPage('config')">
 						<md-icon>settings</md-icon>
