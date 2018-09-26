@@ -13,6 +13,8 @@ namespace shimmerwx\library;
 
 use yesf\Yesf;
 use shimmerwx\model\Config;
+use shimmerwx\model\Token;
+use shimmerwx\model\User;
 
 class PluginHandler {
 	public static function onBeforeDispatcher($module, $controller, $action, $request, $response) {
@@ -21,6 +23,20 @@ class PluginHandler {
 		}
 		if ($module === 'web' && $controller === 'api' && $action !== 'media') {
 			$response->header('Content-Type', 'application/json; charset=UTF-8');
+		}
+		if ($module === 'web' && $controller === 'pageapi') {
+			$response->header('Content-Type', 'application/json; charset=UTF-8');
+			$token = $request->cookie['wechat_token'];
+			$info = Token::get($token);
+			if (!$info) {
+				$response->write(Utils::getWebApiResult([
+					'error' => '未登录'
+				]));
+				return FALSE;
+			}
+			//从数据库中读取
+			$user = User::getInstance()->get($info['id']);
+			$request->user = array_merge($info, $user);
 		}
 		if ($module === 'admin') {
 			$response->header('Content-Type', 'application/json; charset=UTF-8');

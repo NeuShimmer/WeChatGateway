@@ -30,7 +30,7 @@ function Api(param) {
 function loadSetting() {
 	const loading = weui.loading('正在加载设置');
 	Api({
-		url: 'web/privapi/getSetting'
+		url: 'web/pageapi/getSetting'
 	})
 	.then((r) => {
 		document.getElementById('setting-push').checked = r.receive_push == 1;
@@ -40,7 +40,7 @@ function loadSetting() {
 function saveSetting() {
 	const loading = weui.loading('正在保存');
 	Api({
-		url: 'web/privapi/setSetting',
+		url: 'web/pageapi/setSetting',
 		post: {
 			"receive_push": document.getElementById('setting-push').checked ? 1 : 0
 		}
