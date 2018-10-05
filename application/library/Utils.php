@@ -50,6 +50,24 @@ class Utils {
 		}
 	}
 	/**
+	 * 格式化私有API的返回结果
+	 * 
+	 * @access public
+	 * @param array $result
+	 * @return string
+	 */
+	public static function getPrivApiResult($result = []) {
+		if (isset($result['error'])) {
+			return swoole_serialize([
+				'success' => FALSE,
+				'error' => $result['error']
+			]);
+		} else {
+			$result['success'] = TRUE;
+			return swoole_serialize($result);
+		}
+	}
+	/**
 	 * 获取微信配置
 	 * 
 	 * @access public

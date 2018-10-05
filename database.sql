@@ -57,6 +57,7 @@ INSERT INTO `config` (`id`, `value`) VALUES
 ('msg_token', ''),
 ('cookie_domain', '.example.com'),
 ('subscribe_message', ''),
+('privapi_key', ''),
 ('redirect_uri', '');
 
 -- --------------------------------------------------------

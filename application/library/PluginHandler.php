@@ -38,6 +38,23 @@ class PluginHandler {
 			$user = User::getInstance()->get($info['id']);
 			$request->user = array_merge($info, $user);
 		}
+		if ($module === 'web' && $controller === 'privapi') {
+			$response->header('Content-Type', 'application/octet-stream');
+			$key = Config::getInstance()->read('privapi_key');
+			if (empty($key)) {
+				$response->write(Utils::getPrivApiResult([
+					'error' => '请先在后台将私有API密钥设置为非空'
+				]));
+				return FALSE;
+			}
+			$sign = $request->header['x-priv-sign'];
+			if (empty($sign) || $sign !== hash_hmac('md5', $request->rawContent(), $key)) {
+				$response->write(Utils::getPrivApiResult([
+					'error' => '签名校验失败'
+				]));
+				return FALSE;
+			}
+		}
 		if ($module === 'admin') {
 			$response->header('Content-Type', 'application/json; charset=UTF-8');
 			//检查登录状态
