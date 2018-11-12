@@ -17,6 +17,9 @@ use shimmerwx\model\Token;
 use shimmerwx\model\User;
 
 class PluginHandler {
+	public static function onWorkerStart($worker_id, $is_task) {
+		Yesf::setBaseUri(Yesf::app()->getConfig('urlPrefix'));
+	}
 	public static function onBeforeDispatcher($module, $controller, $action, $request, $response) {
 		if ($module === 'index' || ($module === 'web' && $controller === 'page')) {
 			$response->assign('__PUBLIC_URL', Yesf::app()->getConfig('public'));

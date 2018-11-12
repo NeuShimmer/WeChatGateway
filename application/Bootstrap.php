@@ -3,11 +3,12 @@ use yesf\Yesf;
 use yesf\Constant;
 use yesf\library\Plugin;
 use shimmerwx\model\Config;
+use shimmerwx\library\PluginHandler;
 class Bootstrap {
 	public function run() {
-		Yesf::setBaseUri(Yesf::getInstance()->getConfig('urlPrefix'));
 		Yesf::getLoader()->addPsr4('shimmerwx\\library\\', APP_PATH . 'library');
-		Plugin::register('beforeDispatcher', ['\\shimmerwx\\library\\PluginHandler', 'onBeforeDispatcher']);
+		Plugin::register('beforeDispatcher', [PluginHandler::class, 'onBeforeDispatcher']);
+		Plugin::register('workerStart', [PluginHandler::class, 'onWorkerStart']);
 		Config::getInstance();
 	}
 }
