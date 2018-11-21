@@ -17,36 +17,26 @@ use \shimmerwx\model\User;
 
 class Privapi extends ControllerAbstract {
 	/**
-	 * 获取选项
+	 * 发送模板消息
 	 * 
-	 * @api {get} /web/privapi/getSetting 获取选项
-	 * @apiName GetSetting
-	 * @apiGroup PageApi
+	 * @api {post} /web/privapi/send 发送模板消息
+	 * @apiName Send
+	 * @apiGroup PrivateAPI
 	 * 
 	 * @apiSuccess {Int} receive_push 是否接受推送
 	 */
-	public static function getSettingAction($request, $response) {
-		$response->write(Utils::getWebApiResult([
-			'receive_push' => $request->user['receive_push'] ? 1 : 0
-		]));
-	}
-	/**
-	 * 保存设置
-	 * 
-	 * @api {post} /web/pageapi/setSetting 保存设置
-	 * @apiName setSetting
-	 * @apiGroup PageApi
-	 * 
-	 * @apiParam {Int} receive_push 是否接受推送
-	 */
-	public static function setSettingAction($request, $response) {
-		$set = [];
-		if (isset($request->post['receive_push'])) {
-			$set['receive_push'] = $request->post['receive_push'] == 1 ? 1 : 0;
+	public static function sendAction($request, $response) {
+		$wechat = Utils::getWeChat();
+		$data = swoole_unserialize($request->rawContent());
+		//检查是否开启消息推送
+		$user = User::getInstance()->get($data['to']);
+		if (!$user || !$user['receive_push']) {
+			$response->write(Utils::getPrivApiResult([
+				'error' => '无法推送消息'
+			]));
+			return;
 		}
-		if (count($set) > 0) {
-			User::getInstance()->set($set, $request->user['id']);
-		}
-		$response->write(Utils::getWebApiResult());
+		$wechat->send($user['openid'], $data['template'], $data['data'], $data['url'], $data['mini_prog']);
+		$response->write(Utils::getPrivApiResult());
 	}
 }
