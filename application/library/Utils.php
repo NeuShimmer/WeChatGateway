@@ -78,7 +78,8 @@ class Utils {
 		if ($id === -1) {
 			return [
 				'appid' => Config::getInstance()->read('appid'),
-				'secret' => Config::getInstance()->read('appsecret')
+				'secret' => Config::getInstance()->read('appsecret'),
+				'type' => WeChat::TYPE_MP
 			];
 		} else {
 			$app = App::getInstance()->get($id);
@@ -87,7 +88,8 @@ class Utils {
 			}
 			return [
 				'appid' => $app['appid'],
-				'secret' => $app['appsecret']
+				'secret' => $app['appsecret'],
+				'type' => $app['type']
 			];
 		}
 	}
@@ -103,6 +105,6 @@ class Utils {
 		if ($config === NULL) {
 			return NULL;
 		}
-		return WeChat::getInstance($config['appid'], $config['secret']);
+		return WeChat::getInstance($config['appid'], $config['secret'], $config['type']);
 	}
 }

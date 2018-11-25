@@ -1,6 +1,9 @@
 #app .md-app {
 	min-height: 100vh;
 }
+.md-drawer {
+	width: 220px;
+}
 .md-dialog {
 	width: 90%;
 	max-width: 800px;

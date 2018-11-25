@@ -16,15 +16,18 @@ use Swlib\Saber;
 
 class WeChat {
 	const WECHAT_URL = 'https://api.weixin.qq.com/';
+	const TYPE_MP = 1;
+	const TYPE_MINI_PROG = 2;
 	private $appid;
 	private $secret;
+	private $type;
 	/**
 	 * 单例模式相关方法
 	 */
 	public static $_instance = [];
-	public static function getInstance($appid, $secret): WeChat {
+	public static function getInstance($appid, $secret, $type = self::TYPE_MP): WeChat {
 		if (!isset(self::$_instance[$appid])) {
-			self::$_instance[$appid] = new self($appid, $secret);
+			self::$_instance[$appid] = new self($appid, $secret, $type);
 		}
 		return self::$_instance[$appid];
 	}
@@ -71,9 +74,22 @@ class WeChat {
 	 * @param string $appid
 	 * @param string $secret
 	 */
-	public function __construct($appid, $secret) {
+	public function __construct($appid, $secret, $type) {
 		$this->appid = $appid;
 		$this->secret = $secret;
+		$this->type = $type;
+	}
+	/**
+	 * 判断当前实例化的类型
+	 * 
+	 * @access public
+	 * @return boolean
+	 */
+	public function isMp() {
+		return self::TYPE_MP === $this->type;
+	}
+	public function isMiniProg() {
+		return self::TYPE_MINI_PROG === $this->type;
 	}
 	/**
 	 * 获取公众号的AccessToken
@@ -233,6 +249,21 @@ class WeChat {
 			'scope' => 'snsapi_userinfo',
 			'state' => $state
 		]) . '#wechat_redirect';
+	}
+	/**
+	 * SNS接口：获取Session
+	 * 
+	 * @access public
+	 * @param string $code
+	 * @return array
+	 */
+	public function getSnsSession($code) {
+		return self::callApi('jscode2session', [
+			'appid' => $this->appid,
+			'secret' => $this->secret,
+			'js_code' => $code,
+			'grant_type' => 'authorization_code'
+		], NULL, TRUE);
 	}
 	/**
 	 * SNS接口：获取AccessToken

@@ -66,6 +66,7 @@ class Api extends ControllerAbstract {
 	 * 
 	 * @apiSuccess {Int} id 用户在系统内的ID
 	 * @apiSuccess {String} token Token
+	 * @apiSuccess {String} session_key 小程序使用的session_key
 	 * @apiSuccess {String} openid 用户的OpenID
 	 * @apiSuccess {String} unionid 用户的UnionID
 	 * @apiSuccess {String} nickname 用户昵称
@@ -81,33 +82,61 @@ class Api extends ControllerAbstract {
 			return;
 		}
 		$code = $request->get['code'];
-		$token = $wechat->getSnsAccessToken($code);
-		//AuthorizeCode无效
-		if (!$token['access_token']) {
-			$response->write(Utils::getWebApiResult([
-				'error' => 'AuthorizeCode无效'
-			]));
-			return;
-		}
-		//获取用户的基本信息
-		$user = $wechat->getSnsUserInfo($token['access_token'], $token['openid']);
-		$u = User::getInstance()->get([
-			'unionid' => $user['unionid']
-		]);
-		if ($u) {
-			//更新用户信息
-			User::getInstance()->set([
-				'nickname' => $user['nickname']
-			], $u['id']);
-			$user['id'] = $u['id'];
-		} else {
-			$user['id'] = User::getInstance()->add([
-				'openid' => '',
-				'unionid' => $user['unionid'],
-				'nickname' => $user['nickname'],
-				'is_follow' => 0,
-				'receive_push' => 0
+		if ($wechat->isMp()) {
+			$token = $wechat->getSnsAccessToken($code);
+			//AuthorizeCode无效
+			if (!$token['access_token']) {
+				$response->write(Utils::getWebApiResult([
+					'error' => 'AuthorizeCode无效'
+				]));
+				return;
+			}
+			//获取用户的基本信息
+			$user = $wechat->getSnsUserInfo($token['access_token'], $token['openid']);
+			$u = User::getInstance()->get([
+				'unionid' => $user['unionid']
 			]);
+			if ($u) {
+				//更新用户信息
+				User::getInstance()->set([
+					'nickname' => $user['nickname']
+				], $u['id']);
+				$user['id'] = $u['id'];
+			} else {
+				$user['id'] = User::getInstance()->add([
+					'openid' => '',
+					'unionid' => $user['unionid'],
+					'nickname' => $user['nickname'],
+					'is_follow' => 0,
+					'receive_push' => 0
+				]);
+			}
+		} else {
+			//小程序
+			$token = $wechat->getSnsSession($code);
+			if (!$token['session_key']) {
+				$response->write(Utils::getWebApiResult([
+					'error' => 'Code无效'
+				]));
+				return;
+			}
+			//获取用户的基本信息
+			$u = User::getInstance()->get([
+				'unionid' => $token['unionid']
+			]);
+			if (!$u) {
+				$user = [];
+				$user['id'] = User::getInstance()->add([
+					'openid' => '',
+					'unionid' => $user['unionid'],
+					'nickname' => '',
+					'is_follow' => 0,
+					'receive_push' => 0
+				]);
+			} else {
+				$user = $u;
+			}
+			$user['session_key'] = $token['session_key'];
 		}
 		//添加token信息
 		$token = Token::create($user);

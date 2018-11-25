@@ -32,6 +32,7 @@ new Vue({
 	el: '#app',
 	data: function() {
 		return {
+			menuVisible: true,
 			status: 0,
 			activePage: "config",
 			password: "",
@@ -50,7 +51,8 @@ new Vue({
 				id: -1,
 				name: "",
 				appid: "",
-				appsecret: ""
+				appsecret: "",
+				type: 1
 			},
 			show_secret: {
 				show: false,
@@ -161,11 +163,13 @@ new Vue({
 				this.edit_app.name = "";
 				this.edit_app.appid = "";
 				this.edit_app.appsecret = "";
+				this.edit_app.type = 1;
 			} else {
 				this.edit_app.id = app.id;
 				this.edit_app.name = app.name;
 				this.edit_app.appid = app.appid;
 				this.edit_app.appsecret = app.appsecret;
+				this.edit_app.type = parseInt(app.type);
 			}
 			this.edit_app.show = true;
 		},

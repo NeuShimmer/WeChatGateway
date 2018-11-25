@@ -25,6 +25,7 @@ class App extends ControllerAbstract {
 	 * 
 	 * @apiSuccess {Object[]} list 应用列表
 	 * @apiSuccess {Int} list.id 应用ID
+	 * @apiSuccess {Int} list.type 应用类型
 	 * @apiSuccess {String} list.name 应用名称
 	 * @apiSuccess {String} list.appid 应用AppID
 	 * @apiSuccess {String} list.appsecret 应用Secret
@@ -42,6 +43,7 @@ class App extends ControllerAbstract {
 	 * @apiGroup Admin
 	 * 
 	 * @apiParam {Int} id 应用ID，传入-1或不传则视为新建
+	 * @apiParam {Int} type 应用类型
 	 * @apiParam {String} name 应用名称
 	 * @apiParam {String} appid 应用AppID
 	 * @apiParam {String} appsecret 应用Secret
@@ -51,6 +53,7 @@ class App extends ControllerAbstract {
 	public static function saveAction($request, $response) {
 		if (!isset($request->post['id']) || $request->post['id'] == -1) {
 			$id = AppModel::getInstance()->add([
+				'type' => $request->post['type'],
 				'name' => $request->post['name'],
 				'appid' => $request->post['appid'],
 				'appsecret' => $request->post['appsecret']
@@ -58,6 +61,7 @@ class App extends ControllerAbstract {
 		} else {
 			$id = intval($request->post['id']);
 			AppModel::getInstance()->set([
+				'type' => $request->post['type'],
 				'name' => $request->post['name'],
 				'appid' => $request->post['appid'],
 				'appsecret' => $request->post['appsecret']

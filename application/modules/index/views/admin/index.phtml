@@ -16,11 +16,14 @@ use yesf\Yesf;
 </head>
 <body>
 	<div id="app">
-		<md-app md-waterfall md-mode="fixed">
+		<md-app md-waterfall>
 			<md-app-toolbar class="md-primary">
+				<md-button class="md-icon-button" @click="menuVisible = !menuVisible">
+					<md-icon>menu</md-icon>
+				</md-button>
 				<span class="md-title">WeChatGateway管理面板</span>
 			</md-app-toolbar>
-			<md-app-drawer md-permanent="full">
+			<md-app-drawer :md-active.sync="menuVisible" md-persistent="full">
 				<md-list>
 					<md-list-item @click="switchPage('config')">
 						<md-icon>settings</md-icon>
@@ -61,12 +64,14 @@ use yesf\Yesf;
 				<md-table>
 					<md-table-row>
 						<md-table-head md-numeric>ID</md-table-head>
+						<md-table-head>类型</md-table-head>
 						<md-table-head>名称</md-table-head>
 						<md-table-head>AppID</md-table-head>
 						<md-table-head>操作</md-table-head>
 					</md-table-row>
 					<md-table-row v-for="a of app" :key="a.id">
 						<md-table-cell md-numeric>{{a.id}}</md-table-cell>
+						<md-table-cell>{{a.type == 1 ? "公众号" : "小程序"}}</md-table-cell>
 						<md-table-cell>{{a.name}}</md-table-cell>
 						<md-table-cell>{{a.appid}}</md-table-cell>
 						<md-table-cell>
@@ -105,6 +110,13 @@ use yesf\Yesf;
 				<md-field>
 					<label>名称</label>
 					<md-input v-model="edit_app.name"></md-input>
+				</md-field>
+				<md-field>
+					<label>类型</label>
+					<md-select v-model="edit_app.type">
+						<md-option :value="1">公众号</md-option>
+						<md-option :value="2">小程序</md-option>
+					</md-select>
 				</md-field>
 				<md-field>
 					<label>AppID</label>

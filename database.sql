@@ -30,6 +30,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `app` (
   `id` smallint(6) UNSIGNED NOT NULL,
+  `type` tinyint(1) UNSIGNED NOT NULL,
   `name` varchar(40) NOT NULL,
   `appid` varchar(50) NOT NULL,
   `appsecret` varchar(50) NOT NULL
