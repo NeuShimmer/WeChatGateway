@@ -111,6 +111,7 @@ class Api extends ControllerAbstract {
 					'receive_push' => 0
 				]);
 			}
+			$user['app_openid'] = $token['openid'];
 		} else {
 			//小程序
 			$token = $wechat->getSnsSession($code);
@@ -128,7 +129,7 @@ class Api extends ControllerAbstract {
 				$user = [];
 				$user['id'] = User::getInstance()->add([
 					'openid' => '',
-					'unionid' => $user['unionid'],
+					'unionid' => $token['unionid'],
 					'nickname' => '',
 					'is_follow' => 0,
 					'receive_push' => 0
@@ -137,6 +138,7 @@ class Api extends ControllerAbstract {
 				$user = $u;
 			}
 			$user['session_key'] = $token['session_key'];
+			$user['app_openid'] = $token['openid'];
 		}
 		//添加token信息
 		$token = Token::create($user);
