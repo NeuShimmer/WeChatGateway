@@ -71,6 +71,15 @@ class Page extends ControllerAbstract {
 			$response->display('page/redirect');
 			return;
 		}
+		//检查unionid
+		if (!$token['unionid']) {
+			$response->assign('title', '提示');
+			$response->assign('message', '登录失败');
+			$response->assign('desc', 'unionid无效，此问题通常是因为我们配置有误，请联系我们解决此问题');
+			$response->assign('type', 'warn');
+			$response->display('page/notice');
+			return;
+		}
 		//获取用户的基本信息
 		$user = $wechat->getSnsUserInfo($token['access_token'], $token['openid']);
 		//检查是否已经存在，建立openid和unionid的对应关系

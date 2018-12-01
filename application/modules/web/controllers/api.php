@@ -67,6 +67,7 @@ class Api extends ControllerAbstract {
 	 * @apiSuccess {Int} id 用户在系统内的ID
 	 * @apiSuccess {String} token Token
 	 * @apiSuccess {String} session_key 小程序使用的session_key
+	 * @apiSuccess {String} app_openid 当前程序独有的OpenID
 	 * @apiSuccess {String} openid 用户的OpenID
 	 * @apiSuccess {String} unionid 用户的UnionID
 	 * @apiSuccess {String} nickname 用户昵称
@@ -121,19 +122,25 @@ class Api extends ControllerAbstract {
 				]));
 				return;
 			}
+			if (!$token['unionid']) {
+				$response->write(Utils::getWebApiResult([
+					'error' => '请在微信开发者平台将此应用与主应用绑定至同一开发者账号'
+				]));
+				return;
+			}
 			//获取用户的基本信息
 			$u = User::getInstance()->get([
 				'unionid' => $token['unionid']
 			]);
 			if (!$u) {
-				$user = [];
-				$user['id'] = User::getInstance()->add([
+				$user = [
 					'openid' => '',
 					'unionid' => $token['unionid'],
 					'nickname' => '',
 					'is_follow' => 0,
 					'receive_push' => 0
-				]);
+				];
+				$user['id'] = User::getInstance()->add($user);
 			} else {
 				$user = $u;
 			}
