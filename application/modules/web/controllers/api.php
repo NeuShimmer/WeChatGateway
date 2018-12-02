@@ -54,10 +54,10 @@ class Api extends ControllerAbstract {
 		$response->write(Utils::getWebApiResult($result));
 	}
 	/**
-	 * 通过AuthorizeCode，获取用户信息并生成Token
+	 * 通过AuthorizeCode，获取用户信息
 	 * 用于小程序、App等非网页渠道登录
 	 * 
-	 * @api {get} /web/api/token 通过AuthorizeCode，获取用户信息并生成Token
+	 * @api {get} /web/api/token 通过AuthorizeCode，获取用户信息
 	 * @apiName GetToken
 	 * @apiGroup Public
 	 * 
@@ -130,7 +130,7 @@ class Api extends ControllerAbstract {
 	 * 解密小程序中的加密信息
 	 * 如果存在unionid，会自动创建相应的用户
 	 * 
-	 * @api {post} /web/api/decryptData
+	 * @api {post} /web/api/decryptData 解密小程序中的加密信息
 	 * @apiName DecryptData
 	 * @apiGroup Public
 	 * 
