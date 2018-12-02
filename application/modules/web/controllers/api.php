@@ -83,37 +83,7 @@ class Api extends ControllerAbstract {
 			return;
 		}
 		$code = $request->get['code'];
-		if ($wechat->isMp()) {
-			$token = $wechat->getSnsAccessToken($code);
-			//AuthorizeCode无效
-			if (!$token['access_token']) {
-				$response->write(Utils::getWebApiResult([
-					'error' => 'AuthorizeCode无效'
-				]));
-				return;
-			}
-			//获取用户的基本信息
-			$user = $wechat->getSnsUserInfo($token['access_token'], $token['openid']);
-			$u = User::getInstance()->get([
-				'unionid' => $user['unionid']
-			]);
-			if ($u) {
-				//更新用户信息
-				User::getInstance()->set([
-					'nickname' => $user['nickname']
-				], $u['id']);
-				$user['id'] = $u['id'];
-			} else {
-				$user['id'] = User::getInstance()->add([
-					'openid' => '',
-					'unionid' => $user['unionid'],
-					'nickname' => $user['nickname'],
-					'is_follow' => 0,
-					'receive_push' => 0
-				]);
-			}
-			$user['app_openid'] = $token['openid'];
-		} else {
+		if ($wechat->isMiniProg()) {
 			//小程序
 			$token = $wechat->getSnsSession($code);
 			if (!$token['session_key']) {
@@ -123,34 +93,88 @@ class Api extends ControllerAbstract {
 				return;
 			}
 			if (!$token['unionid']) {
-				$response->write(Utils::getWebApiResult([
-					'error' => '请在微信开发者平台将此应用与主应用绑定至同一开发者账号'
-				]));
-				return;
-			}
-			//获取用户的基本信息
-			$u = User::getInstance()->get([
-				'unionid' => $token['unionid']
-			]);
-			if (!$u) {
+				//未关注公众号，因此平台不返回unionid，不创建新用户
 				$user = [
 					'openid' => '',
-					'unionid' => $token['unionid'],
+					'unionid' => '',
 					'nickname' => '',
-					'is_follow' => 0,
-					'receive_push' => 0
+					'is_follow' => 0
 				];
-				$user['id'] = User::getInstance()->add($user);
 			} else {
-				$user = $u;
+				//获取用户的基本信息
+				$user = User::getInstance()->get([
+					'unionid' => $token['unionid']
+				]);
+				if (!$user) {
+					$user = [
+						'openid' => '',
+						'unionid' => $token['unionid'],
+						'nickname' => '',
+						'is_follow' => 0,
+						'receive_push' => 0
+					];
+					$user['id'] = User::getInstance()->add($user);
+				}
 			}
 			$user['session_key'] = $token['session_key'];
 			$user['app_openid'] = $token['openid'];
 		}
 		//添加token信息
-		$token = Token::create($user);
-		$user['token'] = $token;
+		if ($user['id']) {
+			$token = Token::create($user);
+			$user['token'] = $token;
+		}
 		$response->write(Utils::getWebApiResult($user));
+	}
+	/**
+	 * 解密小程序中的加密信息
+	 * 如果存在unionid，会自动创建相应的用户
+	 * 
+	 * @api {post} /web/api/decryptData
+	 * @apiName DecryptData
+	 * @apiGroup Public
+	 * 
+	 * @apiParam {Int} id 指定应用ID（与后台对应）
+	 * @apiParam {String} data 加密数据
+	 * @apiParam {String} iv 加密向量
+	 * @apiParam {String} session_key 登录时获得的SessionKey
+	 * 
+	 * @apiSuccess {Object} result 解密数据
+	 * @apiSuccess {Object} user 如果存在unionid，则为平台用户信息，否则为空
+	 */
+	public static function decryptDataAction($request, $response) {
+		$wechat = Utils::getWeChat($request->post['id']);
+		try {
+			$result = $wechat->decryptData($request->post['data'], $request->post['session_key'], $request->post['iv']);
+		} catch (\Exception $e) {
+			$response->write(Utils::getWebApiResult([
+				'error' => $e->getMessage()
+			]));
+			return;
+		}
+		$out = [
+			'result' => $result
+		];
+		if ($result['unionId']) {
+			//获取用户的基本信息
+			$user = User::getInstance()->get([
+				'unionid' => $result['unionId']
+			]);
+			if (!$user) {
+				$user = [
+					'openid' => '',
+					'unionid' => $result['unionId'],
+					'nickname' => $result['nickName'] || "",
+					'is_follow' => 0,
+					'receive_push' => 0
+				];
+				$user['id'] = User::getInstance()->add($user);
+			}
+			$token = Token::create($user);
+			$user['token'] = $token;
+			$out['user'] = $user;
+		}
+		$response->write(Utils::getWebApiResult($out));
 	}
 	/**
 	 * 获取用户登录状态

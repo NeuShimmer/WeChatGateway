@@ -80,6 +80,15 @@ class WeChat {
 		$this->type = $type;
 	}
 	/**
+	 * 获取AppID
+	 * 
+	 * @access public
+	 * @return string
+	 */
+	public function getAppId() {
+		return $this->appid;
+	}
+	/**
 	 * 判断当前实例化的类型
 	 * 
 	 * @access public
@@ -308,5 +317,34 @@ class WeChat {
 			'refresh_token' => $refresh_token,
 			'grant_type' => 'refresh_token'
 		], NULL, TRUE);
+	}
+	/**
+	 * 解密小程序的加密数据
+	 * 
+	 * @access public
+	 * @param string $data
+	 * @param string $key
+	 * @param string $iv
+	 * @return array
+	 */
+	public function decryptData($data, $key, $iv) {
+		if (strlen($key) != 24) {
+			throw new \Exception('session_key无效');
+		}
+		$aesKey = base64_decode($key);
+		if (strlen($iv) != 24) {
+			throw new \Exception('iv无效');
+		}
+		$aesIV = base64_decode($iv);
+		$aesCipher = base64_decode($data);
+		$result = openssl_decrypt($aesCipher, "AES-128-CBC", $aesKey, 1, $aesIV);
+		$resultArr = json_decode($result, 1);
+		if ($resultArr == NULL) {
+			throw new \Exception('解密失败');
+		}
+		if ($resultArr['watermark']['appid'] != $this->getAppId()) {
+			throw new \Exception('校验失败');
+		}
+		return $resultArr;
 	}
 }
