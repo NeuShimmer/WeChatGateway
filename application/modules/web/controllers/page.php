@@ -45,13 +45,20 @@ class Page extends ControllerAbstract {
 		}
 		$wechat = Utils::getWeChat();
 		$url = $wechat->getSnsLoginUrl(Config::getInstance()->read('redirect_uri'));
+		$response->cookie([
+			'name' => 'wechat_redirect_uri',
+			'value' => $request->get['redirect_uri'],
+			'expire' => 0,
+			'path' => '/',
+			'domain' => Config::getInstance()->read('cookie_domain'),
+			'httponly' => TRUE
+		]);
 		$response->assign('title', '登录');
 		$response->assign('message', '请稍候');
 		$response->assign('desc', '正在前往登录页面');
 		$response->assign('time', 500);
 		$response->assign('type', 'wait');
 		$response->assign('url', $url);
-		$response->assign('extra_script', 'sessionStorage.setItem("redirect_uri", decodeURIComponent("' . urlencode($request->get['redirect_uri']) . '"));');
 		$response->display('page/redirect');
 	}
 	//登录跳转页面
@@ -123,8 +130,7 @@ class Page extends ControllerAbstract {
 		$response->assign('message', '登录成功');
 		$response->assign('desc', '正在前往登录前页面');
 		$response->assign('type', 'success');
-		$response->assign('url', '');
-		$response->assign('extra_script', 'var url=sessionStorage.getItem("redirect_uri");document.getElementById("continue").href=url;setTimeout(()=>{window.location.href=url;},1000);');
+		$response->assign('url', $request->cookie['wechat_redirect_uri']);
 		$response->display('page/redirect');
 	}
 	//用户设置
