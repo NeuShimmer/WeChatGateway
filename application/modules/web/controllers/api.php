@@ -10,11 +10,11 @@
  * @license https://github.com/NeuShimmer/WechatGateway/blob/master/LICENSE
  */
 namespace shimmerwx\controller\web;
-use \yesf\library\ControllerAbstract;
-use \shimmerwx\library\Utils;
-use \shimmerwx\library\WeChat;
-use \shimmerwx\model\Token;
-use \shimmerwx\model\User;
+use yesf\library\ControllerAbstract;
+use shimmerwx\library\Utils;
+use shimmerwx\library\WeChat;
+use shimmerwx\model\Token;
+use shimmerwx\model\User;
 
 class Api extends ControllerAbstract {
 	/**
@@ -64,7 +64,7 @@ class Api extends ControllerAbstract {
 	 * @apiParam {String} code AuthorizeCode
 	 * @apiParam {Int} id 指定应用ID（与后台对应）
 	 * 
-	 * @apiSuccess {Int} id 用户在系统内的ID
+	 * @apiSuccess {Int} id 用户的平台ID
 	 * @apiSuccess {String} token Token
 	 * @apiSuccess {String} session_key 小程序使用的session_key
 	 * @apiSuccess {String} app_openid 当前程序独有的OpenID
@@ -187,6 +187,7 @@ class Api extends ControllerAbstract {
 	 * @apiParam {String} token 系统生成的Token，可选，默认从Cookie中读取
 	 * 
 	 * @apiSuccess {Boolean} is_login 是否已经登录
+	 * @apiSuccess {String} id 用户的平台ID
 	 * @apiSuccess {String} openid 用户的OpenID
 	 * @apiSuccess {String} unionid 用户的UnionID
 	 * @apiSuccess {String} nickname 用户昵称
@@ -225,7 +226,7 @@ class Api extends ControllerAbstract {
 	 * @apiGroup Public
 	 * 
 	 * @apiParam {Int} id 指定应用ID（与后台对应）
-	 * @apiParam {String} media_id 通过JSSDK上传接口得到的媒体文件ID
+	 * @apiParam {String} media_id 通过JS-SDK上传接口得到的媒体文件ID
 	 */
 	public static function mediaAction($request, $response) {
 		$media_id = $request->get['media_id'];
