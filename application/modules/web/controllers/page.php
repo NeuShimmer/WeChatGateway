@@ -10,9 +10,9 @@
  * @license https://github.com/NeuShimmer/WechatGateway/blob/master/LICENSE
  */
 namespace shimmerwx\controller\web;
-use \yesf\library\ControllerAbstract;
-use \shimmerwx\library\Utils;
-use \shimmerwx\library\WeChat;
+use yesf\library\ControllerAbstract;
+use shimmerwx\library\Utils;
+use shimmerwx\library\WeChat;
 use shimmerwx\model\Config;
 use shimmerwx\model\User;
 use shimmerwx\model\Token;
@@ -35,9 +35,9 @@ class Page extends ControllerAbstract {
 			if ($info) {
 				$response->assign('title', '完成登录');
 				$response->assign('message', '登录成功');
-				$response->assign('desc', '正在前往登录前页面');
+				$response->assign('desc', '正在回到登录前页面');
 				$response->assign('type', 'success');
-				$response->assign('time', 500);
+				$response->assign('time', 100);
 				$response->assign('url', $request->get['redirect_uri']);
 				$response->display('page/redirect');
 				return;
@@ -55,7 +55,7 @@ class Page extends ControllerAbstract {
 		]);
 		$response->assign('title', '登录');
 		$response->assign('message', '请稍候');
-		$response->assign('desc', '正在前往登录页面');
+		$response->assign('desc', '正在登录');
 		$response->assign('time', 500);
 		$response->assign('type', 'wait');
 		$response->assign('url', $url);
@@ -71,7 +71,7 @@ class Page extends ControllerAbstract {
 			$url = $wechat->getSnsLoginUrl(Config::getInstance()->read('redirect_uri'));
 			$response->assign('title', '登录');
 			$response->assign('message', '请稍候');
-			$response->assign('desc', '正在前往登录页面');
+			$response->assign('desc', '正在登录');
 			$response->assign('time', 500);
 			$response->assign('type', 'wait');
 			$response->assign('url', $url);
@@ -128,7 +128,7 @@ class Page extends ControllerAbstract {
 		]);
 		$response->assign('title', '完成登录');
 		$response->assign('message', '登录成功');
-		$response->assign('desc', '正在前往登录前页面');
+		$response->assign('desc', '正在回到登录前页面');
 		$response->assign('type', 'success');
 		$response->assign('url', $request->cookie['wechat_redirect_uri']);
 		$response->display('page/redirect');
