@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>扫码登录</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+	<link href="https://res.wx.qq.com/open/libs/weui/1.1.3/weui.min.css" rel="stylesheet">
+</head>
+<body>
+	<div class="weui-msg">
+		<div class="weui-msg__icon-area">
+			<i class="weui-icon-info weui-icon_msg"></i>
+		</div>
+		<div class="weui-msg__text-area">
+			<h2 class="weui-msg__title">确认登录</h2>
+			<p class="weui-msg__desc">您是否要登录此网站</a></p>
+		</div>
+		<div class="weui-msg__opr-area">
+			<p class="weui-btn-area">
+				<button id="submit" class="weui-btn weui-btn_primary">登录</a>
+				<button id="cancel" class="weui-btn weui-btn_default">取消</a>
+			</p>
+		</div>
+		<div class="weui-msg__extra-area">
+			<div class="weui-footer">
+				<p class="weui-footer__text">Copyright © 2018 微光网络工作室</p>
+			</div>
+		</div>
+	</div>
+	<script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+	<script src="https://lib.baomitu.com/zepto/1.2.0/zepto.min.js"></script>
+	<script>
+	;(function() {
+		var prefix = '<?=$urlPrefix?>';
+		var token = '<?=$token?>';
+		$.ajax({
+			url: prefix + 'web/api/init?url=' + encodeURIComponent(location.href),
+			success: function(res) {
+				wx.config({
+					debug: false,
+					appId: res.appid,
+					timestamp: res.timestamp,
+					nonceStr: res.noncestr,
+					signature: res.signature,
+					jsApiList: ['closeWindow']
+				});
+			}
+		});
+		$.get(prefix + 'web/page/mobileStatus?token=' + token + '&status=2');
+		$('#submit').bind('click', function() {
+			$.ajax({
+				url: prefix + 'web/page/mobileStatus?token=' + token + '&status=3',
+				success: function(res) {
+					wx.closeWindow();
+				}
+			});
+		});
+		wx.ready(function() {
+			$('#cancel').bind('click', function() {
+				wx.closeWindow();
+			})
+		});
+	})()
+	</script>
+</body>
+</html>

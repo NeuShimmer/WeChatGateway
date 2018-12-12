@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>PC登录</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+	<link href="https://res.wx.qq.com/open/libs/weui/1.1.3/weui.min.css" rel="stylesheet">
+	<style>
+	#qrcode {
+		height: 240px;
+		width: 240px;
+		image-rendering: -moz-crisp-edges;
+		image-rendering: pixelated;
+		-ms-interpolation-mode: bicubic
+	}
+	</style>
+</head>
+<body>
+	<div class="weui-msg">
+		<div class="weui-msg__icon-area">
+			<img id="qrcode">
+		</div>
+		<div class="weui-msg__text-area">
+			<h2 class="weui-msg__title">请使用手机微信扫码登录</h2>
+		</div>
+		<div class="weui-msg__extra-area">
+			<div class="weui-footer">
+				<p class="weui-footer__text">Copyright © 2018 微光网络工作室</p>
+			</div>
+		</div>
+	</div>
+	<div class="js_dialog" id="dialog" style="display: none">
+		<div class="weui-mask"></div>
+		<div class="weui-dialog weui-skin_android">
+			<div class="weui-dialog__bd">请在手机上确认登录</div>
+			<div class="weui-dialog__ft">
+				<a id="close" href="#" class="weui-dialog__btn weui-dialog__btn_primary">取消</a>
+			</div>
+		</div>
+	</div>
+	<script src="https://lib.baomitu.com/qrious/4.0.2/qrious.min.js"></script>
+	<script src="https://lib.baomitu.com/zepto/1.2.0/zepto.min.js"></script>
+	<script>
+	;(function() {
+		var prefix = '<?=$urlPrefix?>';
+		var loginToken = '';
+		var redirect = decodeURIComponent('<?=urlencode($redirect_uri)?>');
+		function load() {
+			$.ajax({
+				url: prefix + 'web/page/pc?token=' + loginToken,
+				dataType: 'json',
+				success: function(res) {
+					if (res.status === 2) {
+						$('#dialog').show();
+					} else if (res.status === 3) {
+						location.href = redirect;
+					} else {
+						if (res.token != loginToken) {
+							loginToken = res.token;
+							var qr = new QRious({
+								background: 'white',
+								foreground: 'black',
+								level: 'H',
+								padding: 0,
+								size: 490,
+								value: location.protocol + '//' + location.host + prefix + 'web/page/login?redirect_uri=' + encodeURIComponent(prefix + 'web/page/mobileScan?token=' + loginToken)
+							});
+							$('#qrcode').attr('src', qr.toDataURL());
+						}
+					}
+					setTimeout(load, 2000);
+				}
+			});
+		}
+		load();
+		$('#close').bind('click', function() {
+			loginToken = '';
+			$('#dialog').hide();
+		});
+	})()
+	</script>
+</body>
+</html>

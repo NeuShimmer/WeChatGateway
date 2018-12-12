@@ -10,14 +10,34 @@
  * @license https://github.com/NeuShimmer/WechatGateway/blob/master/LICENSE
  */
 namespace shimmerwx\controller\web;
+use yesf\Yesf;
 use yesf\library\ControllerAbstract;
 use shimmerwx\library\Utils;
 use shimmerwx\library\WeChat;
 use shimmerwx\model\Config;
 use shimmerwx\model\User;
 use shimmerwx\model\Token;
+use shimmerwx\model\LoginToken;
 
 class Page extends ControllerAbstract {
+	private static function isMobile($ua) {
+		if (strpos($ua, 'MicroMessage') !== FALSE) {
+			return TRUE;
+		}
+		if (strpos($ua, 'Android') !== FALSE) {
+			return TRUE;
+		}
+		if (strpos($ua, 'iOS') !== FALSE) {
+			return TRUE;
+		}
+		if (strpos($ua, 'iPhone') !== FALSE) {
+			return TRUE;
+		}
+		if (strpos($ua, 'iPad') !== FALSE) {
+			return TRUE;
+		}
+		return FALSE;
+	}
 	/**
 	 * 登录页面
 	 * 
@@ -37,29 +57,117 @@ class Page extends ControllerAbstract {
 				$response->assign('message', '登录成功');
 				$response->assign('desc', '正在回到登录前页面');
 				$response->assign('type', 'success');
-				$response->assign('time', 100);
 				$response->assign('url', $request->get['redirect_uri']);
 				$response->display('page/redirect');
 				return;
 			}
 		}
-		$wechat = Utils::getWeChat();
-		$url = $wechat->getSnsLoginUrl(Config::getInstance()->read('redirect_uri'));
-		$response->cookie([
-			'name' => 'wechat_redirect_uri',
-			'value' => $request->get['redirect_uri'],
-			'expire' => 0,
-			'path' => '/',
-			'domain' => Config::getInstance()->read('cookie_domain'),
-			'httponly' => TRUE
-		]);
-		$response->assign('title', '登录');
-		$response->assign('message', '请稍候');
-		$response->assign('desc', '正在登录');
-		$response->assign('time', 500);
-		$response->assign('type', 'wait');
-		$response->assign('url', $url);
-		$response->display('page/redirect');
+		//如果是PC
+		if (isset($request->get['pc']) && !self::isMobile($request->header['user-agent'])) {
+			$response->assign('redirect_uri', $request->get['redirect_uri']);
+			$response->assign('urlPrefix', Yesf::getBaseUri());
+			$response->display('page/pclogin');
+		} else {
+			$wechat = Utils::getWeChat();
+			$url = $wechat->getSnsLoginUrl(Config::getInstance()->read('redirect_uri'));
+			$response->cookie([
+				'name' => 'wechat_redirect_uri',
+				'value' => $request->get['redirect_uri'],
+				'expire' => 0,
+				'path' => '/',
+				'domain' => Config::getInstance()->read('cookie_domain'),
+				'httponly' => TRUE
+			]);
+			$response->assign('title', '登录');
+			$response->assign('message', '请稍候');
+			$response->assign('desc', '正在登录');
+			$response->assign('type', 'wait');
+			$response->assign('url', $url);
+			$response->display('page/redirect');
+		}
+	}
+	/**
+	 * PC
+	 * 
+	 * @api {get} /web/page/pc PC登录状态
+	 * @apiName Pc
+	 * @apiGroup Web
+	 * 
+	 * @apiParam {String} token LoginToken
+	 * 
+	 * @apiSuccess {String} token LoginToken
+	 * @apiSuccess {Int} status 状态（0=需要新token，1=等待扫码，2=等待确认，3=完成）
+	 */
+	public static function pcAction($request, $response) {
+		$login_token = $request->get['token'];
+		if (!empty($login_token)) {
+			$token_info = LoginToken::get($login_token);
+			if (!$token_info) {
+				unset($token_info);
+			}
+		}
+		if (!isset($token_info)) {
+			$login_token = LoginToken::create();
+			$response->write(Utils::getWebApiResult([
+				'token' => $login_token,
+				'status' => 0
+			]));
+			return;
+		}
+		if ($token_info['status'] === 3) {
+			$token = $token_info['wechat_token'];
+			$response->cookie([
+				'name' => 'wechat_token',
+				'value' => $token,
+				'expire' => 0,
+				'path' => '/',
+				'domain' => Config::getInstance()->read('cookie_domain'),
+				'httponly' => TRUE
+			]);
+			$response->write(Utils::getWebApiResult([
+				'token' => $login_token,
+				'status' => 3
+			]));
+			return;
+		}
+		$response->write(Utils::getWebApiResult([
+			'token' => $login_token,
+			'status' => $token_info['status']
+		]));
+	}
+	/**
+	 * 手机扫码
+	 * 
+	 * @api {get} /web/page/mobileStatus 手机扫码状态
+	 * @apiName MobileStatus
+	 * @apiGroup Web
+	 * 
+	 * @apiParam {String} token LoginToken
+	 * @apiParam {Int} status 状态（2=等待确认，3=完成）
+	 */
+	public static function mobileStatusAction($request, $response) {
+		$status = intval($request->get['status']);
+		$login_token = $request->get['token'];
+		if (!empty($login_token)) {
+			$token_info = LoginToken::get($login_token);
+			if (!$token_info) {
+				unset($token_info);
+			}
+		}
+		if (!isset($token_info)) {
+			return;
+		}
+		$token_info['status'] = $status;
+		if ($status === 3) {
+			$token_info['wechat_token'] = $request->cookie['wechat_token'];
+		}
+		LoginToken::set($login_token, $token_info);
+		$response->write(Utils::getWebApiResult());
+	}
+	public static function mobileScanAction($request, $response) {
+		$response->assign('token', $request->get['token']);
+		$response->assign('urlPrefix', Yesf::getBaseUri());
+		$response->display('page/mobilescan');
 	}
 	//登录跳转页面
 	public static function redirectAction($request, $response) {
@@ -72,7 +180,6 @@ class Page extends ControllerAbstract {
 			$response->assign('title', '登录');
 			$response->assign('message', '请稍候');
 			$response->assign('desc', '正在登录');
-			$response->assign('time', 500);
 			$response->assign('type', 'wait');
 			$response->assign('url', $url);
 			$response->display('page/redirect');
