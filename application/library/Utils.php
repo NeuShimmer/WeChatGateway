@@ -11,6 +11,7 @@
  */
 namespace shimmerwx\library;
 
+use Swoole\Serialize;
 use Swoole\Coroutine as co;
 use shimmerwx\model\Config;
 use shimmerwx\model\App;
@@ -58,13 +59,13 @@ class Utils {
 	 */
 	public static function getPrivApiResult($result = []) {
 		if (isset($result['error'])) {
-			return swoole_serialize([
+			return Serialize::pack([
 				'success' => FALSE,
 				'error' => $result['error']
 			]);
 		} else {
 			$result['success'] = TRUE;
-			return swoole_serialize($result);
+			return Serialize::unpack($result);
 		}
 	}
 	/**

@@ -41,6 +41,7 @@ class WeChat {
 		static $client = NULL;
 		if ($client === NULL) {
 			$client = Saber::create([
+				'timeout' => 15,
 				'base_uri' => self::WECHAT_URL,
 				'use_pool' => 10
 			]);
@@ -200,6 +201,32 @@ class WeChat {
 			$data['miniprogram'] = $mini_prog;
 		}
 		self::callApi('message/template/send', [
+			'access_token' => $access_token
+		], $data);
+	}
+	/**
+	 * 发送模板消息
+	 * 
+	 * @access public
+	 * @param string $to 发送目标用户ID
+	 * @param string $tpl 模板ID
+	 * @param string $datas 模板数据
+	 * @param string $access_token 公众号AccessToken
+	 */
+	public function sendMiniProg($to, $tpl, $datas, $form_id, $page = NULL, $access_token = NULL) {
+		if ($access_token === NULL) {
+			$access_token = $this->getAccessToken();
+		}
+		$data = [
+			'touser' => $to,
+			'template_id' => $tpl,
+			'form_id' => $form_id,
+			'data' => $datas
+		];
+		if ($page) {
+			$data['page'] = $page;
+		}
+		self::callApi('message/wxopen/template/send', [
 			'access_token' => $access_token
 		], $data);
 	}

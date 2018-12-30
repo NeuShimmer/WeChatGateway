@@ -9,7 +9,7 @@
 
 ### 安装说明
 
-* 环境需求：PHP 7.0+，Swoole 4.0+，Swoole Serialize，Redis，MySQL，Composer
+* 环境需求：PHP 7.0+，Swoole 4.0+，Redis，MySQL，Composer
 
 * 运行`composer create-project shimmer/wechat-gateway`
 

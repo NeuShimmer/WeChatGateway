@@ -9,6 +9,7 @@ return [
 		'package_max_length' => 2097152, //1024 * 1024 * 2
 		'buffer_output_size' => 3145728, //1024 * 1024 * 3
 		'pipe_buffer_size' => 33554432, //1024 * 1024 * 32
+		'open_tcp_keepalive' => 1,
 		'open_tcp_nodelay' => 1,
 		'heartbeat_check_interval' => 5, //心跳检测
 		'heartbeat_idle_time' => 11, //心跳检测

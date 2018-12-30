@@ -27,7 +27,7 @@ class Privapi extends ControllerAbstract {
 	 */
 	public static function sendAction($request, $response) {
 		$wechat = Utils::getWeChat();
-		$data = swoole_unserialize($request->rawContent());
+		$data = Serialize::unpack($request->rawContent());
 		//检查是否开启消息推送
 		$user = User::getInstance()->get($data['to']);
 		if (!$user || !$user['receive_push']) {

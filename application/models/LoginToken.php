@@ -10,6 +10,7 @@
  * @license https://github.com/NeuShimmer/WechatGateway/blob/master/LICENSE
  */
 namespace shimmerwx\model;
+use Swoole\Serialize;
 use yesf\library\ModelAbstract;
 use shimmerwx\library\Cache;
 use shimmerwx\library\Utils;
@@ -27,7 +28,7 @@ class LoginToken {
 	public static function get($token) {
 		$result = Cache::get('login_token_' . $token);
 		if ($result) {
-			return swoole_unserialize($result);
+			return Serialize::unpack($result);
 		}
 		return NULL;
 	}
@@ -38,7 +39,7 @@ class LoginToken {
 	 * @return string
 	 */
 	public static function set($token, $info) {
-		Cache::set('login_token_' . $token, swoole_serialize($info), self::EXPIRE);
+		Cache::set('login_token_' . $token, Serialize::pack($info), self::EXPIRE);
 		return $token;
 	}
 	/**
@@ -49,7 +50,7 @@ class LoginToken {
 	 */
 	public static function create() {
 		$token = hash('sha256', uniqid(Utils::getRandStr(4), TRUE));
-		Cache::set('login_token_' . $token, swoole_serialize([
+		Cache::set('login_token_' . $token, Serialize::pack([
 			'status' => 1,
 			'wechat_token' => null
 		]), self::EXPIRE);

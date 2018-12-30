@@ -39,7 +39,7 @@
 			</div>
 		</div>
 	</div>
-	<script src="https://lib.baomitu.com/qrious/4.0.2/qrious.min.js"></script>
+	<script src="https://lib.baomitu.com/qrcode-generator/1.4.1/qrcode.min.js"></script>
 	<script src="https://lib.baomitu.com/zepto/1.2.0/zepto.min.js"></script>
 	<script>
 	;(function() {
@@ -58,15 +58,10 @@
 					} else {
 						if (res.token != loginToken) {
 							loginToken = res.token;
-							var qr = new QRious({
-								background: 'white',
-								foreground: 'black',
-								level: 'H',
-								padding: 0,
-								size: 490,
-								value: location.protocol + '//' + location.host + prefix + 'web/page/login?redirect_uri=' + encodeURIComponent(prefix + 'web/page/mobileScan?token=' + loginToken)
-							});
-							$('#qrcode').attr('src', qr.toDataURL());
+							var qr = qrcode(0, 'H');
+							qr.addData(location.protocol + '//' + location.host + prefix + 'web/page/login?redirect_uri=' + encodeURIComponent(prefix + 'web/page/mobileScan?token=' + loginToken));
+							qr.make();
+							$('#qrcode').attr('src', qr.createDataURL(Math.floor(240 / qr.getModuleCount()), 0));
 						}
 					}
 					setTimeout(load, 2000);
